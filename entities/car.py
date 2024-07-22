@@ -72,7 +72,6 @@ class Car:
             self.width if self.direction in ['up', 'down'] else self.length, 
             self.length if self.direction in ['up', 'down'] else self.width
             )
-        print(rect.x, rect.y, rect.width, rect.height)
         
         pygame.draw.rect(self.window, self.color, rect)
 
