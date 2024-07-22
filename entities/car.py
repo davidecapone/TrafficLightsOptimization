@@ -72,6 +72,7 @@ class Car:
             self.width if self.direction in ['up', 'down'] else self.length, 
             self.length if self.direction in ['up', 'down'] else self.width
             )
+        print(rect.x, rect.y, rect.width, rect.height)
         
         pygame.draw.rect(self.window, self.color, rect)
 
@@ -91,7 +92,7 @@ class Car:
             return [(self.x + self.length, self.y + self.width // 2), (self.x + self.length - 10, self.y + self.width // 2), (self.x + self.length + 5, self.y + self.width // 2 - 5), (self.x + self.length + 5, self.y + self.width // 2 + 5)]
 
     def _draw_waiting_time(self):
-        font = pygame.font.Font(None, WAITING_TIME_FONT_SIZE)
+        font = pygame.font.Font(None, 20)   # font size for waiting time
         text = font.render(str(self.waiting_time // 30), True, (255, 255, 255))
         text = pygame.transform.rotate(text, 90)
         self.window.blit(text, (self.x + 5, self.y + 5))
