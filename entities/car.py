@@ -26,6 +26,15 @@ class Car:
     def get_direction(self) -> CarActions:
         return self.direction
 
+    def get_position(self) -> tuple:
+        return self.x, self.y
+    
+    def increase_waiting_time(self):
+        self.waiting_time += 1
+
+    def set_waiting_time(self, time):
+        self.waiting_time = time
+
     def _set_veichle_coordinates(self, direction: CarActions) -> tuple:
         """Set the initial coordinates of the vehicle based on the direction it is facing.
         Args:

@@ -162,7 +162,7 @@ class Ambient():
             for car in self.cars:
 
                 if car.isStopped:
-                    car.waiting_time += 1
+                    car.increase_waiting_time()
 
                     if ((car.get_direction() in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == TrafficLightColor.GREEN.value) or 
                         (car.get_direction() in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == TrafficLightColor.GREEN.value)):
@@ -170,18 +170,19 @@ class Ambient():
                         car.move()
 
                 else:   # car is moving
-                    car.waiting_time = 0
+                    car.set_waiting_time(0)
+                    car_x, car_y = car.get_position()
 
-                    if ((car.get_direction() == CarActions.UP and car.y == self.window_height//2 + 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
-                        (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
-                        (car.get_direction() == CarActions.LEFT and car.x == self.window_width//2 + 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
-                        (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]))) or not car.can_move(self.cars):
+                    if ((car.get_direction() == CarActions.UP and car_y == self.window_height//2 + 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.DOWN and car_y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.LEFT and car_x == self.window_width//2 + 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.RIGHT and car_x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]))) or not car.can_move(self.cars):
                         car.stop()
                     else:
-                        if ((car.get_direction() == CarActions.UP and car.y <= self.window_height//2 + Car.SPEED and car.y >= self.window_height//2 - Car.SPEED) or
-                            (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH >= self.window_height//2 - Car.SPEED and car.y + Car.LENGTH <= self.window_height//2 + Car.SPEED) or
-                            (car.get_direction() == CarActions.LEFT and car.x <= self.window_width//2 + Car.SPEED and car.x >= self.window_width//2 - Car.SPEED) or
-                            (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH >= self.window_width//2 - Car.SPEED and car.x + Car.LENGTH <= self.window_width//2 + Car.SPEED)):
+                        if ((car.get_direction() == CarActions.UP and car_y <= self.window_height//2 + Car.SPEED and car_y >= self.window_height//2 - Car.SPEED) or
+                            (car.get_direction() == CarActions.DOWN and car_y + Car.LENGTH >= self.window_height//2 - Car.SPEED and car_y + Car.LENGTH <= self.window_height//2 + Car.SPEED) or
+                            (car.get_direction() == CarActions.LEFT and car_x <= self.window_width//2 + Car.SPEED and car_x >= self.window_width//2 - Car.SPEED) or
+                            (car.get_direction() == CarActions.RIGHT and car_x + Car.LENGTH >= self.window_width//2 - Car.SPEED and car_x + Car.LENGTH <= self.window_width//2 + Car.SPEED)):
                             car.turn_or_straight()
                         car.move()
                 car.draw()
