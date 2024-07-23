@@ -125,30 +125,28 @@ class Ambient():
         pygame.draw.line(self.window, stoplight.color_EW, (self.window_width//2 + 33, self.window_height//2 - 27), (self.window_width//2 + 33, self.window_height//2 - 2), 5)
 
     def start(self):
-        # TODO: remove these lines and use the Stoplight class instead:
-        RED = (255, 0, 0, 100)
-        GREEN = (0, 255, 0, 100)
-        YELLOW = (255, 255, 0, 100)
 
-        stoplight = Stoplight( random.choice([GREEN, RED]) )
+        stoplight = Stoplight()
         prev_time = 0
         
         while True:
 
-            # remove cars that have left the screen
+            # Remove cars that have left the screen
             self.cars = [car for car in self.cars if car.x >= 0 and car.x <= self.window_width and car.y >= 0 and car.y <= self.window_height]
             
+            # Draw the ambient
             self._blit_images()
             self._draw_lines()
             self.draw_stoplight(stoplight)
 
             self.clock.tick(60)
 
+            # Check for events
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.display.quit()
                     pygame.quit()
                     return
+            
 
             time = pygame.time.get_ticks() // 1000
 
@@ -166,18 +164,18 @@ class Ambient():
                 if car.isStopped:
                     car.waiting_time += 1
 
-                    if ((car.get_direction() in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == GREEN) or 
-                        (car.get_direction() in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == GREEN)):
+                    if ((car.get_direction() in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == TrafficLightColor.GREEN.value) or 
+                        (car.get_direction() in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == TrafficLightColor.GREEN.value)):
                         car.isStopped = False
                         car.move()
 
                 else:   # car is moving
                     car.waiting_time = 0
 
-                    if ((car.get_direction() == CarActions.UP and car.y == self.window_height//2 + 50 and (stoplight.color_NS in [RED, YELLOW])) or
-                        (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [RED, YELLOW])) or
-                        (car.get_direction() == CarActions.LEFT and car.x == self.window_width//2 + 50 and (stoplight.color_EW in [RED, YELLOW])) or
-                        (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [RED, YELLOW]))) or not car.can_move(self.cars):
+                    if ((car.get_direction() == CarActions.UP and car.y == self.window_height//2 + 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.LEFT and car.x == self.window_width//2 + 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
+                        (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]))) or not car.can_move(self.cars):
                         car.stop()
                     else:
                         if ((car.get_direction() == CarActions.UP and car.y <= self.window_height//2 + Car.SPEED and car.y >= self.window_height//2 - Car.SPEED) or

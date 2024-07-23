@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
 from entities.colors import TrafficLightColor
+import random
 
 class Stoplight:
     GREEN_DURATION = 300  # ticks
     YELLOW_DURATION = 90  # ticks
 
-    def __init__(self, color):
+    def __init__(self):
         
-        self.color_NS = color
+        # generate random color for north-south direction:
+        self.color_NS = TrafficLightColor.GREEN.value if random.choice([True, False]) else TrafficLightColor.RED.value
 
-        if self.color_NS == TrafficLightColor.GREEN.value:
-            self.color_EW = TrafficLightColor.RED.value
-        else:
-            self.color_EW = TrafficLightColor.GREEN.value
+        # set the opposite color for east-west direction:
+        self.color_EW = TrafficLightColor.RED.value if self.color_NS == TrafficLightColor.GREEN.value else TrafficLightColor.GREEN.value
 
         self.time_yellow = 0
         self.time_green = 0
