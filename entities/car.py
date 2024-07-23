@@ -23,6 +23,9 @@ class Car:
 
         self.color = self._generate_random_color()
 
+    def get_direction(self) -> CarActions:
+        return self.direction
+
     def _set_veichle_coordinates(self, direction: CarActions) -> tuple:
         """Set the initial coordinates of the vehicle based on the direction it is facing.
         Args:

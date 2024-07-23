@@ -134,6 +134,9 @@ class Ambient():
         prev_time = 0
         
         while True:
+
+            # remove cars that have left the screen
+            self.cars = [car for car in self.cars if car.x >= 0 and car.x <= self.window_width and car.y >= 0 and car.y <= self.window_height]
             
             self._blit_images()
             self._draw_lines()
@@ -145,15 +148,14 @@ class Ambient():
                 if event.type == pygame.QUIT:
                     pygame.display.quit()
                     pygame.quit()
-
+                    return
 
             time = pygame.time.get_ticks() // 1000
 
             if time != prev_time:
-                if time % 2 == 0:
+                if time % 2 == 0:   # every 2 seconds a car is created in a random lane
                     car = Car(window=self.window)
                     self.cars.append(car)
-                    
                 prev_time = time
 
             if stoplight.time_green >= 300:
@@ -164,30 +166,26 @@ class Ambient():
                 if car.isStopped:
                     car.waiting_time += 1
 
-                    if ((car.direction in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == GREEN) or 
-                        (car.direction in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == GREEN)):
+                    if ((car.get_direction() in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == GREEN) or 
+                        (car.get_direction() in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == GREEN)):
                         car.isStopped = False
                         car.move()
 
-                else:
+                else:   # car is moving
                     car.waiting_time = 0
 
-                    if ((car.direction == CarActions.UP and car.y == self.window_height//2 + 50 and (stoplight.color_NS == RED or stoplight.color_NS == YELLOW)) or
-                        (car.direction == CarActions.DOWN and car.y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS == RED or stoplight.color_NS == YELLOW)) or
-                        (car.direction == CarActions.LEFT and car.x == self.window_width//2 + 50 and (stoplight.color_EW == RED or stoplight.color_EW == YELLOW)) or
-                        (car.direction == CarActions.RIGHT and car.x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW == RED or stoplight.color_EW == YELLOW))) or not car.can_move(self.cars):
+                    if ((car.get_direction() == CarActions.UP and car.y == self.window_height//2 + 50 and (stoplight.color_NS in [RED, YELLOW])) or
+                        (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [RED, YELLOW])) or
+                        (car.get_direction() == CarActions.LEFT and car.x == self.window_width//2 + 50 and (stoplight.color_EW in [RED, YELLOW])) or
+                        (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [RED, YELLOW]))) or not car.can_move(self.cars):
                         car.stop()
                     else:
-                        if ((car.direction == CarActions.UP and car.y <= self.window_height//2 + Car.SPEED and car.y >= self.window_height//2 - Car.SPEED) or
-                            (car.direction == CarActions.DOWN and car.y + Car.LENGTH >= self.window_height//2 - Car.SPEED and car.y + Car.LENGTH <= self.window_height//2 + Car.SPEED) or
-                            (car.direction == CarActions.LEFT and car.x <= self.window_width//2 + Car.SPEED and car.x >= self.window_width//2 - Car.SPEED) or
-                            (car.direction == CarActions.RIGHT and car.x + Car.LENGTH >= self.window_width//2 - Car.SPEED and car.x + Car.LENGTH <= self.window_width//2 + Car.SPEED)):
+                        if ((car.get_direction() == CarActions.UP and car.y <= self.window_height//2 + Car.SPEED and car.y >= self.window_height//2 - Car.SPEED) or
+                            (car.get_direction() == CarActions.DOWN and car.y + Car.LENGTH >= self.window_height//2 - Car.SPEED and car.y + Car.LENGTH <= self.window_height//2 + Car.SPEED) or
+                            (car.get_direction() == CarActions.LEFT and car.x <= self.window_width//2 + Car.SPEED and car.x >= self.window_width//2 - Car.SPEED) or
+                            (car.get_direction() == CarActions.RIGHT and car.x + Car.LENGTH >= self.window_width//2 - Car.SPEED and car.x + Car.LENGTH <= self.window_width//2 + Car.SPEED)):
                             car.turn_or_straight()
                         car.move()
                 car.draw()
-
-            # remove cars that have left the screen
-            self.cars = [car for car in self.cars if car.x >= 0 and car.x <= self.window_width and car.y >= 0 and car.y <= self.window_height]
-
                 
             pygame.display.update()
