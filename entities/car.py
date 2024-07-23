@@ -32,8 +32,14 @@ class Car:
     def increase_waiting_time(self):
         self.waiting_time += 1
 
-    def set_waiting_time(self, time):
+    def set_waiting_time(self, time:int):
         self.waiting_time = time
+
+    def set_stopped(self, isStopped:bool):
+        self.isStopped = isStopped
+
+    def is_stopped(self) -> bool:
+        return self.isStopped
 
     def _set_veichle_coordinates(self, direction: CarActions) -> tuple:
         """Set the initial coordinates of the vehicle based on the direction it is facing.
@@ -64,7 +70,7 @@ class Car:
     def move(self):
 
         if self.isStopped:
-            self.waiting_time += 1
+            return
         else:
             if self.direction == CarActions.UP:
                 self.y -= Car.SPEED
@@ -118,7 +124,7 @@ class Car:
         self.window.blit(text, (self.x + 5, self.y + 5))
 
     def stop(self):
-        self.isStopped = True
+        self.set_stopped(True)
 
     def can_move(self, other_cars):
         for other_car in other_cars:

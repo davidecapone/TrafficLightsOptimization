@@ -149,11 +149,9 @@ class Ambient():
             
 
             time = pygame.time.get_ticks() // 1000
-
-            if time != prev_time:
-                if time % 2 == 0:   # every 2 seconds a car is created in a random lane
-                    car = Car(window=self.window)
-                    self.cars.append(car)
+            if time != prev_time and time % 2 == 0:
+                car = Car(window=self.window)
+                self.cars.append(car)
                 prev_time = time
 
             if stoplight.time_green >= 300:
@@ -161,15 +159,15 @@ class Ambient():
 
             for car in self.cars:
 
-                if car.isStopped:
+                if car.is_stopped():    # Car is stopped
                     car.increase_waiting_time()
 
                     if ((car.get_direction() in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == TrafficLightColor.GREEN.value) or 
                         (car.get_direction() in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == TrafficLightColor.GREEN.value)):
-                        car.isStopped = False
+                        car.set_stopped(False)
                         car.move()
 
-                else:   # car is moving
+                else:   # Car is moving
                     car.set_waiting_time(0)
                     car_x, car_y = car.get_position()
 
@@ -177,7 +175,7 @@ class Ambient():
                         (car.get_direction() == CarActions.DOWN and car_y + Car.LENGTH == self.window_height//2 - 50 and (stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
                         (car.get_direction() == CarActions.LEFT and car_x == self.window_width//2 + 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])) or
                         (car.get_direction() == CarActions.RIGHT and car_x + Car.LENGTH == self.window_width//2 - 50 and (stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]))) or not car.can_move(self.cars):
-                        car.stop()
+                        car.set_stopped(True)
                     else:
                         if ((car.get_direction() == CarActions.UP and car_y <= self.window_height//2 + Car.SPEED and car_y >= self.window_height//2 - Car.SPEED) or
                             (car.get_direction() == CarActions.DOWN and car_y + Car.LENGTH >= self.window_height//2 - Car.SPEED and car_y + Car.LENGTH <= self.window_height//2 + Car.SPEED) or
