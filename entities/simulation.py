@@ -15,7 +15,9 @@ class Simulation:
                  ambient_images_path: list, 
                  window_size: tuple = (1000, 1000), 
                  audio_effect_path: str = None,
-                 traffic_mdp: TrafficMDP = None):
+                 traffic_mdp: TrafficMDP = None,
+                 car_spawn_frequency: float = 1.5,
+                 max_simulation_time: float = 120) -> None:
         
         assert len(ambient_images_path) == 4, "Ambient must have 4 images"
         assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
@@ -27,6 +29,9 @@ class Simulation:
         self.environment = Environment(self.window, self._load_images(ambient_images_path))
         self.car_manager = CarManager(self.window)
         self.stoplight_manager = StoplightManager()
+
+        self.car_spawn_frequency = car_spawn_frequency
+        self.max_simulation_time = max_simulation_time
 
         if audio_effect_path:
             self._load_audio(audio_effect_path, volume=0.2)
@@ -47,8 +52,6 @@ class Simulation:
         prev_time = 0
         clock = pygame.time.Clock()
 
-        car_frequency = 1.5 # Add a car every 1.5 seconds
-        max_time = 120 # Stop the simulation after 120 seconds
         frame = 0
         seconds_passed = 0
 
@@ -70,7 +73,7 @@ class Simulation:
 
             time = round(pygame.time.get_ticks() // 1000, 1)
 
-            if time != prev_time and time % car_frequency == 0: # Add a car every 1.5 seconds
+            if time != prev_time and time % self.car_spawn_frequency == 0: # Add a car every 'spawn_frequency' seconds
 
                 """
                 ???
@@ -81,10 +84,10 @@ class Simulation:
                     self.car_manager.add_car(direction = [CarActions.LEFT, CarActions.RIGHT])
                 else:
                     self.car_manager.add_car()
-                    
+
                 prev_time = time
 
-            if time >= max_time: # Stop the simulation after 120 seconds
+            if time >= self.max_simulation_time: # Stop the simulation after 'max_simulation_time' seconds
                 pygame.quit()
                 return
             
