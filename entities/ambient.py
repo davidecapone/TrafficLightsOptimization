@@ -5,6 +5,9 @@ from entities.stoplight import Stoplight
 from entities.colors import TrafficLightColor
 from entities.car_actions import CarActions
 
+# Colors
+WHITE = (255, 255, 255)
+GRAY = (128, 128, 128)
 
 class Ambient():
     def __init__(self, name:str, ambient_images_path:list, window_size:tuple = (1000, 1000), audio_effect_path:str = None):
@@ -66,56 +69,24 @@ class Ambient():
             pygame.mixer.music.play(-1)
 
     def _draw_lines(self):
-
-        WHITE = (255, 255, 255)
-        GRAY = (128, 128, 128)
-
         # Draw intersection
-        ## Draw road
-        pygame.draw.line(self.window, GRAY, (0, self.window_height//2), (self.window_width, self.window_height//2), 60)
-        pygame.draw.line(self.window, GRAY, (self.window_width//2, 0), (self.window_width//2, self.window_height), 60)
-        ## Draw lanes
-        pygame.draw.line(self.window, WHITE, (0, self.window_height//2 - 28), (self.window_width, self.window_height//2 - 28), 1)
-        pygame.draw.line(self.window, WHITE, (0, self.window_height//2 + 28), (self.window_width, self.window_height//2 + 28), 1)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 28, 0), (self.window_width//2 - 28, self.window_height), 1)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 28, 0), (self.window_width//2 + 28, self.window_height), 1)
-        pygame.draw.line(self.window, WHITE, (0, self.window_height//2), (self.window_width, self.window_height//2), 4)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2, 0), (self.window_width//2, self.window_height), 4)
-        ## Draw crosswalks
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 23, self.window_height//2 - 200), (self.window_width//2 - 23, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 17, self.window_height//2 -200), (self.window_width//2 - 17, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 12, self.window_height//2 - 200), (self.window_width//2 - 12, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 6, self.window_height//2 - 200), (self.window_width//2 - 6, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 6, self.window_height//2 - 200), (self.window_width//2 + 6, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 12, self.window_height//2 - 200), (self.window_width//2 + 12, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 17, self.window_height//2 - 200), (self.window_width//2 + 17, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 23, self.window_height//2 - 200), (self.window_width//2 + 23, self.window_height//2 - 180), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 - 23), (self.window_width//2 - 180, self.window_height//2 - 23), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 - 17), (self.window_width//2 - 180, self.window_height//2 - 17), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 - 12), (self.window_width//2 - 180, self.window_height//2 - 12), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 - 6), (self.window_width//2 - 180, self.window_height//2 - 6), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 + 6), (self.window_width//2 - 180, self.window_height//2 + 6), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 + 12), (self.window_width//2 - 180, self.window_height//2 + 12), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 + 17), (self.window_width//2 - 180, self.window_height//2 + 17), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 200, self.window_height//2 + 23), (self.window_width//2 - 180, self.window_height//2 + 23), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 - 23), (self.window_width//2 + 200, self.window_height//2 - 23), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 - 17), (self.window_width//2 + 200, self.window_height//2 - 17), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 - 12), (self.window_width//2 + 200, self.window_height//2 - 12), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 - 6), (self.window_width//2 + 200, self.window_height//2 - 6), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 + 6), (self.window_width//2 + 200, self.window_height//2 + 6), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 + 12), (self.window_width//2 + 200, self.window_height//2 + 12), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 + 17), (self.window_width//2 + 200, self.window_height//2 + 17), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 180, self.window_height//2 + 23), (self.window_width//2 + 200, self.window_height//2 + 23), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 23, self.window_height//2 + 200), (self.window_width//2 - 23, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 17, self.window_height//2 + 200), (self.window_width//2 - 17, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 12, self.window_height//2 + 200), (self.window_width//2 - 12, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 - 6, self.window_height//2 + 200), (self.window_width//2 - 6, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 6, self.window_height//2 + 200), (self.window_width//2 + 6, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 12, self.window_height//2 + 200), (self.window_width//2 + 12, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 17, self.window_height//2 + 200), (self.window_width//2 + 17, self.window_height//2 + 220), 2)
-        pygame.draw.line(self.window, WHITE, (self.window_width//2 + 23, self.window_height//2 + 200), (self.window_width//2 + 23, self.window_height//2 + 220), 2)
-        ## Cover intersection
-        pygame.draw.rect(self.window, GRAY, (self.window_width//2 - 29, self.window_height//2 - 29, 60, 60))
+        pygame.draw.line(self.window, GRAY, (0, self.window_height // 2), (self.window_width, self.window_height // 2), 60)
+        pygame.draw.line(self.window, GRAY, (self.window_width // 2, 0), (self.window_width // 2, self.window_height), 60)
+        # Draw lanes
+        for offset in [-28, 28]:
+            pygame.draw.line(self.window, WHITE, (0, self.window_height // 2 + offset), (self.window_width, self.window_height // 2 + offset), 1)
+            pygame.draw.line(self.window, WHITE, (self.window_width // 2 + offset, 0), (self.window_width // 2 + offset, self.window_height), 1)
+        pygame.draw.line(self.window, WHITE, (0, self.window_height // 2), (self.window_width, self.window_height // 2), 4)
+        pygame.draw.line(self.window, WHITE, (self.window_width // 2, 0), (self.window_width // 2, self.window_height), 4)
+        # Draw crosswalks
+        crosswalk_offsets = [-23, -17, -12, -6, 6, 12, 17, 23]
+        for offset in crosswalk_offsets:
+            pygame.draw.line(self.window, WHITE, (self.window_width // 2 + offset, self.window_height // 2 - 200), (self.window_width // 2 + offset, self.window_height // 2 - 180), 2)
+            pygame.draw.line(self.window, WHITE, (self.window_width // 2 + offset, self.window_height // 2 + 200), (self.window_width // 2 + offset, self.window_height // 2 + 220), 2)
+            pygame.draw.line(self.window, WHITE, (self.window_width // 2 - 200, self.window_height // 2 + offset), (self.window_width // 2 - 180, self.window_height // 2 + offset), 2)
+            pygame.draw.line(self.window, WHITE, (self.window_width // 2 + 180, self.window_height // 2 + offset), (self.window_width // 2 + 200, self.window_height // 2 + offset), 2)
+        # Cover intersection
+        pygame.draw.rect(self.window, GRAY, (self.window_width // 2 - 29, self.window_height // 2 - 29, 60, 60))
 
     def draw_stoplight(self, stoplight:Stoplight):
 
