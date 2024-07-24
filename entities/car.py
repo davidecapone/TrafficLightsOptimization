@@ -8,13 +8,17 @@ class Car:
     WIDTH = 20
     LENGTH = 40
 
-    def __init__(self, window):
+    def __init__(self, window, direction=None):
 
         self.window = window
         self.window_width = self.window.get_width()
         self.window_height = self.window.get_height()
 
-        self.direction = random.choice([CarActions.UP, CarActions.DOWN, CarActions.LEFT, CarActions.RIGHT])
+        if direction:
+            self.direction = random.choice(direction)
+        else:
+            self.direction = random.choice([CarActions.UP, CarActions.DOWN, CarActions.LEFT, CarActions.RIGHT])
+            
         self.x, self.y = self._set_veichle_coordinates(self.direction)
 
         self.isStopped = False

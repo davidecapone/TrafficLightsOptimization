@@ -18,6 +18,12 @@ class Stoplight:
         self.time_yellow = 0
         self.time_green = 0
 
+    def get_ns_color(self):
+        return self.color_NS
+    
+    def get_ew_color(self):
+        return self.color_EW
+
 
     def switch_yellow(self):
 

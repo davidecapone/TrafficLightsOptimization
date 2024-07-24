@@ -10,13 +10,21 @@ class CarManager:
             self.window = window
             self.cars = []
 
-    def add_car(self):
+    def get_cars(self) -> list:
+        return self.cars
+
+    def add_car(self, direction = None):
+
+        if direction:
+            car = Car(window=self.window, direction=direction)
+        else:
             car = Car(window=self.window)
-            self.cars.append(car)
+            
+        self.cars.append(car)
 
     def update_cars(self, stoplight):
             for car in self.cars:
-                    self.update_car(car, stoplight)
+                self.update_car(car, stoplight)
 
     def update_car(self, car, stoplight):
         if car.is_stopped():

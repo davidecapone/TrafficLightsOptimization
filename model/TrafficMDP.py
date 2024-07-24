@@ -1,3 +1,8 @@
+import random
+
+WINDOW_WIDTH = 1000
+WINDOW_HEIGHT = 1000
+
 class TrafficMDP:
     '''
     TrafficMDP class that represents the Markov Decision Process for the traffic intersection.
