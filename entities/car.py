@@ -21,25 +21,32 @@ class Car:
         self.turn_right = random.choice([False, True])
         self.waiting_time = 0
 
-        self.color = self._generate_random_color()
+        self.color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
+
 
     def get_direction(self) -> CarActions:
         return self.direction
 
     def get_position(self) -> tuple:
         return self.x, self.y
-    
+
     def increase_waiting_time(self):
         self.waiting_time += 1
 
     def set_waiting_time(self, time:int):
         self.waiting_time = time
 
+    def get_waiting_time(self) -> int:
+        return self.waiting_time
+
     def set_stopped(self, isStopped:bool):
         self.isStopped = isStopped
 
     def is_stopped(self) -> bool:
         return self.isStopped
+    
+    def is_out_of_window(self) -> bool:
+        return self.x < 0 or self.x > self.window_width or self.y < 0 or self.y > self.window_height
 
     def _set_veichle_coordinates(self, direction: CarActions) -> tuple:
         """Set the initial coordinates of the vehicle based on the direction it is facing.
@@ -48,7 +55,6 @@ class Car:
         Returns:
             tuple: The x and y coordinates of the vehicle.
         """
-
         if direction == CarActions.UP:
             return self.window_width // 2 + 5, self.window_height
         elif direction == CarActions.DOWN:
@@ -58,28 +64,17 @@ class Car:
         elif direction == CarActions.RIGHT:
             return 0, self.window_height // 2 + 5
 
-
-    def _generate_random_color(self):
-        """Generate a random color for the vehicle.
-
-        Returns:
-            tuple: The RGB values of the color.
-        """
-        return (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
-
     def move(self):
-
-        if self.isStopped:
-            return
-        else:
-            if self.direction == CarActions.UP:
-                self.y -= Car.SPEED
-            elif self.direction == CarActions.DOWN:
-                self.y += Car.SPEED
-            elif self.direction == CarActions.LEFT:
-                self.x -= Car.SPEED
-            elif self.direction == CarActions.RIGHT:
-                self.x += Car.SPEED
+        assert not self.is_stopped(), "Car is stopped, cannot move"
+        self.set_waiting_time(0)
+        if self.direction == CarActions.UP:
+            self.y -= Car.SPEED
+        elif self.direction == CarActions.DOWN:
+            self.y += Car.SPEED
+        elif self.direction == CarActions.LEFT:
+            self.x -= Car.SPEED
+        elif self.direction == CarActions.RIGHT:
+            self.x += Car.SPEED
 
     def draw(self):
         pygame.draw.rect(self.window, self.color, self._generate_car_rect())
@@ -119,12 +114,9 @@ class Car:
 
     def _draw_waiting_time(self):
         font = pygame.font.Font(None, 20)   # font size for waiting time
-        text = font.render(str(self.waiting_time // 30), True, (255, 255, 255))
+        text = font.render(str(self.get_waiting_time() // 30), True, (255, 255, 255))
         text = pygame.transform.rotate(text, 90)
         self.window.blit(text, (self.x + 5, self.y + 5))
-
-    def stop(self):
-        self.set_stopped(True)
 
     def can_move(self, other_cars):
         for other_car in other_cars:
