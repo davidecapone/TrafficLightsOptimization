@@ -9,7 +9,7 @@ from entities.car_actions import CarActions
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
 
-class Ambient():
+class Simulation():
     def __init__(self, name:str, ambient_images_path:list, window_size:tuple = (1000, 1000), audio_effect_path:str = None):
 
         assert len(ambient_images_path) == 4, "Ambient must have 4 images"
@@ -18,7 +18,6 @@ class Ambient():
         pygame.init()
 
         self.window = pygame.display.set_mode(window_size)
-
         self.window_width = self.window.get_width()
         self.window_height = self.window.get_height()
 
@@ -45,6 +44,8 @@ class Ambient():
                 ambient_images.append(pygame.image.load(image_path))
     
             return ambient_images
+
+            # using list com
     
     def _resize_images(self, ambient_images:list) -> None:
          
@@ -95,7 +96,7 @@ class Ambient():
         pygame.draw.line(self.window, stoplight.color_EW, (self.window_width//2 - 32, self.window_height//2 + 3), (self.window_width//2 - 32, self.window_height//2 + 27), 5)
         pygame.draw.line(self.window, stoplight.color_EW, (self.window_width//2 + 33, self.window_height//2 - 27), (self.window_width//2 + 33, self.window_height//2 - 2), 5)
 
-    def start(self):
+    def run(self):
 
         stoplight = Stoplight()
         prev_time = 0
