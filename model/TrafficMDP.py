@@ -1,4 +1,5 @@
 import random
+from entities.car_actions import CarActions
 
 WINDOW_WIDTH = 1000
 WINDOW_HEIGHT = 1000
@@ -44,19 +45,19 @@ class TrafficMDP:
         '''
         if state == 'EW':
             stopped_cars = [car for car in cars if 
-                            car.direction in ['up', 'down']
-                            and car.stopped]
+                            car.direction in [CarActions.UP, CarActions.DOWN]
+                            and car.is_stopped()]
             incoming_cars = len([car for car in cars if 
-                                 (car.x > WINDOW_WIDTH//2 and car.direction == 'left') 
-                                 or (car.x < WINDOW_WIDTH//2 and car.direction == 'right') 
-                                 and not car.stopped ])
+                                 (car.x > WINDOW_WIDTH//2 and car.direction == CarActions.LEFT) 
+                                 or (car.x < WINDOW_WIDTH//2 and car.direction == CarActions.RIGHT) 
+                                 and not car.is_stopped()])
         else:
             stopped_cars = [car for car in cars if
-                            car.direction in ['left', 'right']
-                            and car.stopped]
-            incoming_cars = len([car for car in cars if (car.y > WINDOW_HEIGHT//2 and car.direction == 'up')
-                                 or (car.y < WINDOW_HEIGHT//2 and car.direction == 'down')
-                                 and not car.stopped])
+                            car.direction in [CarActions.LEFT, CarActions.RIGHT]
+                            and car.is_stopped()]
+            incoming_cars = len([car for car in cars if (car.y > WINDOW_HEIGHT//2 and car.direction == CarActions.UP)
+                                 or (car.y < WINDOW_HEIGHT//2 and car.direction == CarActions.DOWN)
+                                 and not car.is_stopped()])
 
         avg_wait_time = sum(car.waiting_time//30 for car in stopped_cars) / len(stopped_cars) if stopped_cars else 0
 

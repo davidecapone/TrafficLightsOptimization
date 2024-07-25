@@ -4,7 +4,7 @@ from entities.car_actions import CarActions
 
 class Car:
 
-    SPEED = 5
+    SPEED = 3
     WIDTH = 20
     LENGTH = 40
 
