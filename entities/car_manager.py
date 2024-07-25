@@ -22,6 +22,15 @@ class CarManager:
             
         self.cars.append(car)
 
+    def get_stopped_cars(self, directions: list) -> list:
+        """
+        Get the cars that are stopped and are in the specified directions.
+        
+        Parameters:
+        - directions: list of directions to filter the cars
+        """
+        return [car for car in self.cars if car.direction in directions and car.is_stopped()]
+
     def update_cars(self, stoplight):
         for car in self.cars:
             self.update_car(car, stoplight)
@@ -49,9 +58,7 @@ class CarManager:
         [car.draw() for car in self.cars]
 
     def should_stop(self, car, stoplight):
-        x, y = car.get_position()
         car_direction = car.get_direction()
-        mid_x, mid_y = self.window.get_width() // 2, self.window.get_height() // 2
     
         return (
             (car_direction in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]) or
