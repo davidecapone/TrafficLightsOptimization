@@ -23,8 +23,8 @@ class CarManager:
         self.cars.append(car)
 
     def update_cars(self, stoplight):
-            for car in self.cars:
-                self.update_car(car, stoplight)
+        for car in self.cars:
+            self.update_car(car, stoplight)
 
     def update_car(self, car, stoplight):
         if car.is_stopped():
@@ -46,8 +46,7 @@ class CarManager:
             self.cars.remove(car)
 
     def draw_cars(self):
-        for car in self.cars:
-            car.draw()
+        [car.draw() for car in self.cars]
 
     def should_stop(self, car, stoplight):
         x, y = car.get_position()

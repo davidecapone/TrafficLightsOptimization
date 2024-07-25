@@ -70,7 +70,7 @@ class Car:
 
     def move(self):
         assert not self.is_stopped(), "Car is stopped, cannot move"
-        self.set_waiting_time(0)
+        #self.set_waiting_time(0)
         if self.direction == CarActions.UP:
             self.y -= Car.SPEED
         elif self.direction == CarActions.DOWN:
