@@ -15,7 +15,6 @@ class Simulation:
                  ambient_images_path: list, 
                  window_size: tuple = (1000, 1000), 
                  audio_effect_path: str = None,
-                 traffic_mdp: TrafficMDP = None,
                  car_spawn_frequency: float = 1.5,
                  max_simulation_time: float = 120) -> None:
         
@@ -36,8 +35,6 @@ class Simulation:
         if audio_effect_path:
             self._load_audio(audio_effect_path, volume=0.2)
 
-        if traffic_mdp:
-            self.traffic_mdp = traffic_mdp
 
     def _load_images(self, ambient_images_path: list) -> None:
         return [pygame.image.load(image_path) for image_path in ambient_images_path]
@@ -48,7 +45,7 @@ class Simulation:
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)
 
-    def run(self) -> None:
+    def run(self, mdp) -> None:
         prev_time = 0
         clock = pygame.time.Clock()
 
@@ -69,27 +66,35 @@ class Simulation:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
+                    print("Simulation ended.")
                     return
 
-            time = round(pygame.time.get_ticks() // 1000, 1)
+            time = round(pygame.time.get_ticks() / 1000, 1)
 
             if time != prev_time and time % self.car_spawn_frequency == 0: # Add a car every 'spawn_frequency' seconds
 
                 """
-                ???
+                TODO: Da decidere i times
                 """
                 if time < 30:
+                    # Add a car that can go up or down
                     self.car_manager.add_car(direction = [CarActions.UP, CarActions.DOWN])
                 elif 60 < time < 90:
+                    # Add a car that can go left or right
                     self.car_manager.add_car(direction = [CarActions.LEFT, CarActions.RIGHT])
                 else:
+                    # Add a car that can go in all directions
                     self.car_manager.add_car()
 
                 prev_time = time
 
-            if time >= self.max_simulation_time: # Stop the simulation after 'max_simulation_time' seconds
+
+            # Stop the simulation after 'max_simulation_time' seconds
+            if time >= self.max_simulation_time: 
                 pygame.quit()
+                print("Simulation ended.")
                 return
+            
             
             frame += 1
             seconds_passed = frame // 30
@@ -98,9 +103,9 @@ class Simulation:
             if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and seconds_passed >= 5):
 
                 state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
-                self.traffic_mdp.policy_iteration(self.car_manager.get_cars())
-                action = self.traffic_mdp.get_action(state)
-                print(action)
+                mdp.policy_iteration(self.car_manager.get_cars())
+                action = mdp.get_action(state)
+                print(f"State {state}, Action: {action}")
 
                 if action == 'change':
                     self.stoplight_manager.stoplight.switch_yellow()
