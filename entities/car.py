@@ -114,7 +114,7 @@ class Car:
         elif self.direction == CarActions.LEFT:
             return [(self.x, self.y), (self.x + 10, self.y), (self.x - 5, self.y - 5), (self.x + 15, self.y - 5)]
         else:  # self.direction == 'right'
-            return [(self.x + Car.LENGTH, self.y + Car.WIDTH // 2), (self.x + Car.LENGTH - 10, self.y + Car.WIDTH // 2), (self.x + Car.LENGTH + 5, self.y + Car.WIDTH // 2 - 5), (self.x + Car.LENGTH + 5, self.y + Car.WIDTH // 2 + 5)]
+            return [(self.x + Car.LENGTH, self.y + Car.WIDTH), (self.x + Car.LENGTH - 10, self.y + Car.WIDTH ), (self.x + Car.LENGTH + 5, self.y + Car.WIDTH + 5), (self.x + Car.LENGTH - 15, self.y + Car.WIDTH + 5)]
 
     def _draw_waiting_time(self):
         font = pygame.font.Font(None, 20)   # font size for waiting time
