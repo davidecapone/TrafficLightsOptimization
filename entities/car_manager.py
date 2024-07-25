@@ -36,7 +36,7 @@ class CarManager:
                 car.set_stopped(False)
                 car.move()
 
-        elif self.is_at_intersection(car) and self.should_stop(car, stoplight) or not car.can_move(self.cars):
+        elif (self.is_at_intersection(car) and self.should_stop(car, stoplight)) or not car.can_move(self.cars):
             car.set_stopped(True)
         else:
             car.turn_or_straight()
@@ -53,12 +53,10 @@ class CarManager:
         x, y = car.get_position()
         car_direction = car.get_direction()
         mid_x, mid_y = self.window.get_width() // 2, self.window.get_height() // 2
-
+    
         return (
-            (car_direction == CarActions.UP and y == mid_y + 50 and stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]) or
-            (car_direction == CarActions.DOWN and y + Car.LENGTH == mid_y - 50 and stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]) or
-            (car_direction == CarActions.LEFT and x == mid_x + 50 and stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]) or
-            (car_direction == CarActions.RIGHT and x + Car.LENGTH == mid_x - 50 and stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])
+            (car_direction in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value]) or
+            (car_direction in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])
         )
 
     def is_at_intersection(self, car):
@@ -68,8 +66,8 @@ class CarManager:
         offset = 50
 
         return (
-            (car_direction == CarActions.UP and mid_y - offset <= y <= mid_y + offset) or
-            (car_direction == CarActions.DOWN and mid_y - offset <= y + Car.LENGTH <= mid_y + offset) or
-            (car_direction == CarActions.LEFT and mid_x - offset <= x <= mid_x + offset) or
-            (car_direction == CarActions.RIGHT and mid_x - offset <= x + Car.LENGTH <= mid_x + offset)
+            (car_direction == CarActions.UP and (mid_y + offset <= y <= mid_y + offset + 3)) or
+            (car_direction == CarActions.DOWN and (mid_y - offset - 3 <= y + Car.LENGTH <= mid_y - offset)) or
+            (car_direction == CarActions.LEFT and (mid_x + offset <= x <= mid_x + offset + 3)) or
+            (car_direction == CarActions.RIGHT and (mid_x - offset - 3 <= x + Car.LENGTH <= mid_x - offset))
         )
