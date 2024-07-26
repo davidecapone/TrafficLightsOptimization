@@ -13,9 +13,9 @@ class Simulation:
     """
     def __init__(self, 
                  name: str, 
-                 proportions: list,
+                 car_spwan_policy: list,
                  car_spawn_frequency: float = 1.5,
-                 max_simulation_time: float = 120) -> None:
+                 simulation_duration: float = 120) -> None:
         
         # Initialize the environment, car manager and stoplight manager
         self.environment = Environment(
@@ -31,17 +31,21 @@ class Simulation:
 
         # Simulation parameters
         self.car_spawn_frequency = car_spawn_frequency
-        self.max_simulation_time = max_simulation_time
+        self.simulation_duration = simulation_duration
 
         # Statistics
         self.cumulative_waiting_times = {'mdp': [0], 'ft': [0]}
         self.queue_lengths = {'mdp': [], 'ft': []}
         self.n_stopped_cars = {'mdp': 0, 'ft': 0}
 
-        self.proportions = proportions
+        self.car_spwan_policy = car_spwan_policy
 
         # Calculate the intervals
-        self.intervals = self.calculate_intervals(max_simulation_time, self.proportions)
+        self.intervals = self.calculate_intervals(
+            simulation_duration, 
+            self.car_spwan_policy
+        )
+
         print(self.intervals)
 
     def run(self, mdp, test='mdp') -> None:
@@ -108,8 +112,8 @@ class Simulation:
 
                 prev_time = total_seconds
 
-            # Stop the simulation after 'max_simulation_time' seconds
-            if total_seconds >= self.max_simulation_time: 
+            # Stop the simulation after 'simulation_duration' seconds
+            if total_seconds >= self.simulation_duration: 
                 pygame.quit()
                 print("Simulation ended.")
                 return
