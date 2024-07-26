@@ -48,7 +48,13 @@ class Simulation:
 
         print(self.intervals)
 
-    def run(self, mdp, test='mdp') -> None:
+    def run(self, mode:str) -> None:
+
+        assert mode in ['mdp', 'ft'], "Mode must be either 'mdp' or 'ft'"
+
+        if mode == 'mdp':
+            mdp = TrafficMDP()
+
         prev_time = 0
         clock = pygame.time.Clock()
 
@@ -94,20 +100,27 @@ class Simulation:
                 elif interval == 'all_directions':
                     self.car_manager.add_car()
 
-                if total_seconds % 1 == 0:
-                    self.cumulative_waiting_times[test].append(cumulative_waiting_time // 30)
+                #if total_seconds % 1 == 0:
+                #    self.cumulative_waiting_times[test].append(cumulative_waiting_time // 30)
 
-                if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
-                     self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
-                     total_seconds % 7 == 0 and 
-                     int(total_seconds) != int(prev_time)):
 
-                    state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
-                    mdp.policy_iteration(self.car_manager.get_cars())
-                    action = mdp.get_action(state)
-                    # print(f"State {state}, Action: {action}")
+                if mode == 'mdp':
 
-                    if action == 'change':
+                    if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
+                        self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
+                        total_seconds % 7 == 0 and 
+                        int(total_seconds) != int(prev_time)):
+
+                        state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
+                        mdp.policy_iteration(self.car_manager.get_cars())
+                        action = mdp.get_action(state)
+                        # print(f"State {state}, Action: {action}")
+
+                        if action == 'change':
+                            self.stoplight_manager.stoplight.switch_yellow()
+
+                elif mode == 'ft':
+                    if self.stoplight_manager.stoplight.time_green >= 300:
                         self.stoplight_manager.stoplight.switch_yellow()
 
                 prev_time = total_seconds
