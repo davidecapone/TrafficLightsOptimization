@@ -13,14 +13,9 @@ class Simulation:
     """
     def __init__(self, 
                  name: str, 
-                 window_size: tuple = (1000, 1000), 
                  car_spawn_frequency: float = 1.5,
                  max_simulation_time: float = 120) -> None:
         
-        assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
-        assert name, "Name for the simulation must be a valid string"
-        assert max_simulation_time > 0, "Simulation time must be greater than 0"
-
         # Initialize the environment, car manager and stoplight manager
         self.environment = Environment(
             window_size=(1000, 1000),

@@ -14,6 +14,9 @@ class Environment:
     """
     def __init__(self, window_size, name, audio):
         
+        assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
+        assert name, "Name for the simulation must be a valid string"
+
         self.window = None
         self._pygame_init(window_size, name, audio=audio)
 
