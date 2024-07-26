@@ -34,7 +34,7 @@ class TrafficMDP:
         Parameters:
         - cars: list of Car objects
         - action: action to take
-        - state: state to transition to
+        - state: actual state
 
         Returns:
         - reward: reward for the given state-action pair
@@ -116,7 +116,7 @@ class TrafficMDP:
                 new_value = 0
                 for action in self.actions:
                     for state_ in self.states:
-                        new_value += self.policy[state][action] * self.get_transition_probability(cars, action, state, state_) * (self.get_reward(cars, action, state_) + self.discount_factor * self.values[state_])
+                        new_value += self.policy[state][action] * self.get_transition_probability(cars, action, state, state_) * (self.get_reward(cars, action, state) + self.discount_factor * self.values[state_])
 
                 self.values[state] = new_value
 
