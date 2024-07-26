@@ -38,9 +38,6 @@ class Simulation:
         self.n_stopped_cars = {'mdp': 0, 'ft': 0}
 
 
-    def _load_pygame_images(self, ambient_images_path: list) -> None:
-        return [pygame.image.load(image_path) for image_path in ambient_images_path]
-
     def run(self, mdp, test='mdp') -> None:
         prev_time = 0
         clock = pygame.time.Clock()
