@@ -66,6 +66,9 @@ class Simulation:
                     print("Simulation ended.")
                     return
 
+            frame += 1
+            seconds_passed = frame // 30
+
             time = round(pygame.time.get_ticks() / 1000, 1)
 
             if time != prev_time and time % self.car_spawn_frequency == 0: # Add a car every 'spawn_frequency' seconds
@@ -98,6 +101,21 @@ class Simulation:
                 if time % 1 == 0:
                     self.cumulative_waiting_times[test].append(cumulative_waiting_time//30)
 
+                if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
+                     self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
+                     seconds_passed >= 7 and 
+                     int(time) != int(prev_time)):
+
+                    state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
+                    mdp.policy_iteration(self.car_manager.get_cars())
+                    action = mdp.get_action(state)
+                    print(f"State {state}, Action: {action}")
+
+                    if action == 'change':
+                        self.stoplight_manager.stoplight.switch_yellow()
+                        seconds_passed = 0
+                        frame = 0
+
                 prev_time = time
 
             # Stop the simulation after 'max_simulation_time' seconds
@@ -105,23 +123,6 @@ class Simulation:
                 pygame.quit()
                 print("Simulation ended.")
                 return
-
-            frame += 1
-            seconds_passed = frame // 30
-
-            if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
-                 self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
-                 seconds_passed >= 5):
-
-                state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
-                mdp.policy_iteration(self.car_manager.get_cars())
-                action = mdp.get_action(state)
-                print(f"State {state}, Action: {action}")
-
-                if action == 'change':
-                    self.stoplight_manager.stoplight.switch_yellow()
-                    seconds_passed = 0
-                    frame = 0
 
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
             self.car_manager.draw_cars()
