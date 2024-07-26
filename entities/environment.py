@@ -1,23 +1,47 @@
 import pygame
-import random
-from entities.car import Car
-from entities.stoplight import Stoplight
-from entities.colors import TrafficLightColor
-from entities.car_actions import CarActions
+import os
 
 # Colors
 WHITE = (255, 255, 255)
 GRAY = (128, 128, 128)
 
+AMBIENT_IMAGES_PATH = './assets/img/'
+AUDIO_PATH = './assets/audio/street_sound_effect.mp3'
+
 class Environment:
     """
     Defines the environment of the simulation, which includes the images and the drawing of the environment.
     """
-    def __init__(self, window, ambient_images):
-        self.window = window
-        self.ambient_images = self._resize_images(ambient_images)
-        self.window_width = window.get_width()
-        self.window_height = window.get_height()
+    def __init__(self, window_size, name, audio):
+        
+        self.window = None
+        self._pygame_init(window_size, name, audio=audio)
+
+        self.ambient_images = self._resize_images(
+            self._load_pygame_images(
+                [os.path.join(AMBIENT_IMAGES_PATH, image) for image in os.listdir(AMBIENT_IMAGES_PATH)]
+            )
+        )
+
+        self.window_width = self.window.get_width()
+        self.window_height = self.window.get_height()
+
+    def get_window(self):
+        return self.window
+
+    def _pygame_init(self, window_size:tuple, name:str, audio:bool) -> None:
+        pygame.init()
+        pygame.display.set_caption(name)
+        self.window = pygame.display.set_mode(window_size)
+
+        if audio:
+            pygame.mixer.init()
+            pygame.mixer.music.load(audio)
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.music.play(-1)
+
+    def _load_pygame_images(self, ambient_images_path: list) -> None:
+        return [pygame.image.load(image_path) for image_path in ambient_images_path]
 
     def _resize_images(self, ambient_images):
         window_width = self.window.get_width()

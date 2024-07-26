@@ -6,27 +6,30 @@ from model import TrafficMDP
 from entities.colors import TrafficLightColor
 from entities.car_actions import CarActions
 
+
 class Simulation:
     """
     Defines the simulation of the traffic light.
     """
     def __init__(self, 
                  name: str, 
-                 ambient_images_path: list, 
                  window_size: tuple = (1000, 1000), 
-                 audio_effect_path: str = None,
                  car_spawn_frequency: float = 1.5,
                  max_simulation_time: float = 120) -> None:
         
-        assert len(ambient_images_path) == 4, "Ambient must have 4 images"
         assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
         assert name, "Name for the simulation must be a valid string"
-
-        # Initialize pygame and the window
-        self._pygame_init(window_size, name, audio_effect_path)
+        assert max_simulation_time > 0, "Simulation time must be greater than 0"
 
         # Initialize the environment, car manager and stoplight manager
-        self.environment = Environment(self.window, self._load_pygame_images(ambient_images_path))
+        self.environment = Environment(
+            window_size=(1000, 1000),
+            name=name,
+            audio=False
+        )
+
+        self.window = self.environment.get_window()
+
         self.car_manager = CarManager(self.window)
         self.stoplight_manager = StoplightManager()
 
@@ -40,21 +43,8 @@ class Simulation:
         self.n_stopped_cars = {'mdp': 0, 'ft': 0}
 
 
-    def _pygame_init(self, window_size:tuple, name:str, audio_effect_path:str) -> None:
-        pygame.init()
-        pygame.display.set_caption(name)
-        self.window = pygame.display.set_mode(window_size)
-
-        if audio_effect_path:
-            pygame.mixer.init()
-            pygame.mixer.music.load(audio_effect_path)
-            pygame.mixer.music.set_volume(0.2)
-            pygame.mixer.music.play(-1)
-
-
     def _load_pygame_images(self, ambient_images_path: list) -> None:
         return [pygame.image.load(image_path) for image_path in ambient_images_path]
-
 
     def run(self, mdp, test='mdp') -> None:
         prev_time = 0
