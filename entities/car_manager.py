@@ -1,4 +1,5 @@
 from entities.car import Car
+from entities.stoplight import Stoplight
 from entities.car_actions import CarActions
 from entities.colors import TrafficLightColor
 
@@ -10,17 +11,13 @@ class CarManager:
             self.window = window
             self.cars = []
 
+    def add_car(self, direction = None):
+        self.cars.append(
+            Car(self.window, direction=direction) if direction else Car(self.window)
+        )
+
     def get_cars(self) -> list:
         return self.cars
-
-    def add_car(self, direction = None):
-
-        if direction:
-            car = Car(window=self.window, direction=direction)
-        else:
-            car = Car(window=self.window)
-            
-        self.cars.append(car)
 
     def get_stopped_cars(self, directions: list) -> list:
         """
@@ -35,7 +32,14 @@ class CarManager:
         for car in self.cars:
             self.update_car(car, stoplight)
 
-    def update_car(self, car, stoplight):
+    def update_car(self, car, stoplight) -> None:
+        """
+        Update the car's position and state.
+
+        Parameters:
+        - car: Car object
+        - stoplight: Stoplight object
+        """
         if car.is_stopped():
             car.increase_waiting_time()
             car_direction = car.get_direction()
@@ -54,10 +58,18 @@ class CarManager:
         if car.is_out_of_window():
             self.cars.remove(car)
 
-    def draw_cars(self):
-        [car.draw() for car in self.cars]
 
-    def should_stop(self, car, stoplight):
+    def should_stop(self, car:Car, stoplight:Stoplight) -> bool:
+        """
+        Check the stoplight color and the car direction to determine if the car should stop.
+        
+        Parameters:
+        - car: Car object
+        - stoplight: Stoplight object
+        
+        Returns:
+        - boolean: True if the car should stop, False otherwise
+        """
         car_direction = car.get_direction()
     
         return (
@@ -65,7 +77,16 @@ class CarManager:
             (car_direction in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW in [TrafficLightColor.RED.value, TrafficLightColor.YELLOW.value])
         )
 
-    def is_at_intersection(self, car):
+    def is_at_intersection(self, car:Car) -> bool:
+        """
+        Check if the car is at the intersection.
+
+        Parameters:
+        - car: Car object
+
+        Returns:
+        - boolean: True if the car is at the intersection, False otherwise
+        """
         car_direction = car.get_direction()
         x, y = car.get_position()
         mid_x, mid_y = self.window.get_width() // 2, self.window.get_height() // 2
@@ -77,3 +98,8 @@ class CarManager:
             (car_direction == CarActions.LEFT and (mid_x + offset <= x <= mid_x + offset + 3)) or
             (car_direction == CarActions.RIGHT and (mid_x - offset - 3 <= x + Car.LENGTH <= mid_x - offset))
         )
+
+    def draw_cars(self):
+        [car.draw() for car in self.cars]
+
+    
