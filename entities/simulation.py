@@ -32,6 +32,11 @@ class Simulation:
         self.car_spawn_frequency = car_spawn_frequency
         self.max_simulation_time = max_simulation_time
 
+        # Statistics
+        self.cumulative_waiting_times = {'mdp': [0], 'ft': [0]}
+        self.queue_lengths = {'mdp': [], 'ft': []}
+        self.n_stopped_cars = {'mdp': 0, 'ft': 0}
+
         if audio_effect_path:
             self._load_audio(audio_effect_path, volume=0.2)
 
@@ -45,12 +50,16 @@ class Simulation:
         pygame.mixer.music.set_volume(volume)
         pygame.mixer.music.play(-1)
 
-    def run(self, mdp) -> None:
+    def run(self, mdp, test='mdp') -> None:
         prev_time = 0
         clock = pygame.time.Clock()
 
         frame = 0
         seconds_passed = 0
+
+        # Temporary statistics
+        queued_cars = {'up': 0, 'down': 0, 'left': 0, 'right': 0}
+        cumulative_waiting_time = 0
 
         while True:
             clock.tick(30)
@@ -75,19 +84,33 @@ class Simulation:
 
                 """
                 TODO: Da decidere i times
+                ciao :) ti ho aggiunto un esempio di times insieme alle statistiche, modifica i times come meglio credi!
+                ricordati che entrambi i test devono avere la stessa simulazione
+                al momento è così:
+                Ogni test dura 5 minuti
+                - primo minuto: up-down
+                - secondo minuto: tutte le direzioni
+                - terzo minuto: niente
+                - quarto minuto: left-right
+                - quinto minuto: tutte le direzioni
                 """
-                if time < 30:
+                if time < 60 or (300 < time and time < 360):
                     # Add a car that can go up or down
                     self.car_manager.add_car(direction = [CarActions.UP, CarActions.DOWN])
-                elif 60 < time < 90:
+                elif 180 < time and time < 240 or (480 < time and time < 540):
                     # Add a car that can go left or right
                     self.car_manager.add_car(direction = [CarActions.LEFT, CarActions.RIGHT])
-                else:
+                elif 60 < time and time < 120 or (240 < time and time < 300) or (360 < time and time < 420) or (540 < time and time < 600):
                     # Add a car that can go in all directions
                     self.car_manager.add_car()
+                else:
+                    # No cars
+                    continue
+
+                if time % 1 == 0:
+                    self.cumulative_waiting_times[test].append(cumulative_waiting_time//30)
 
                 prev_time = time
-
 
             # Stop the simulation after 'max_simulation_time' seconds
             if time >= self.max_simulation_time: 
