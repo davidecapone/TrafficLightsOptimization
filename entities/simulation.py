@@ -2,7 +2,7 @@ import pygame
 from entities.environment import Environment
 from entities.car_manager import CarManager
 from entities.stoplight_manager import StoplightManager
-from model import TrafficMDP
+from model.TrafficMDP import TrafficMDP
 from entities.colors import TrafficLightColor
 from entities.car_actions import CarActions
 import time
@@ -135,6 +135,7 @@ class Simulation:
 
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
             self.car_manager.draw_cars()
+            self.draw_info_panel(total_seconds, interval, mode)
             pygame.display.update()
 
     def calculate_intervals(self, total_time, proportions):
@@ -152,4 +153,30 @@ class Simulation:
             if cycle_time < cumulative_time:
                 return interval
         return None
+
+    def draw_info_panel(self, total_seconds, interval, mode):
+        font = pygame.font.SysFont(None, 24)
+        panel_color = (30, 30, 30)
+        text_color = (255, 255, 255)
+
+        # Create a surface for the panel
+        panel_surface = pygame.Surface((300, 130))
+        panel_surface.fill(panel_color)
+        
+        # Render the text
+        elapsed_time_text = font.render(f"Elapsed Time: {total_seconds} sec", True, text_color)
+        interval_text = font.render(f"Current Interval: {interval}", True, text_color)
+        car_count_text = font.render(f"Total Cars: {len(self.car_manager.cars)}", True, text_color)
+        mode_text = font.render(f"Mode: {'fixed time' if mode == 'ft' else 'mdp'}", True, text_color)
+
+        # Blit the text onto the panel surface
+        panel_surface.blit(elapsed_time_text, (10, 10))
+        panel_surface.blit(interval_text, (10, 40))
+        panel_surface.blit(car_count_text, (10, 70))
+        panel_surface.blit(mode_text, (10, 100))
+
+        # Blit the panel surface onto the window
+        self.window.blit(panel_surface, (10, 10))
+
+    
 
