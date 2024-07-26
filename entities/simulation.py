@@ -20,15 +20,17 @@ class Simulation:
         
         assert len(ambient_images_path) == 4, "Ambient must have 4 images"
         assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
+        assert name, "Name for the simulation must be a valid string"
 
-        pygame.init()
-        pygame.display.set_caption(name)
+        # Initialize pygame and the window
+        self._pygame_init(window_size, name, audio_effect_path)
 
-        self.window = pygame.display.set_mode(window_size)
-        self.environment = Environment(self.window, self._load_images(ambient_images_path))
+        # Initialize the environment, car manager and stoplight manager
+        self.environment = Environment(self.window, self._load_pygame_images(ambient_images_path))
         self.car_manager = CarManager(self.window)
         self.stoplight_manager = StoplightManager()
 
+        # Simulation parameters
         self.car_spawn_frequency = car_spawn_frequency
         self.max_simulation_time = max_simulation_time
 
@@ -37,18 +39,22 @@ class Simulation:
         self.queue_lengths = {'mdp': [], 'ft': []}
         self.n_stopped_cars = {'mdp': 0, 'ft': 0}
 
+
+    def _pygame_init(self, window_size:tuple, name:str, audio_effect_path:str) -> None:
+        pygame.init()
+        pygame.display.set_caption(name)
+        self.window = pygame.display.set_mode(window_size)
+
         if audio_effect_path:
-            self._load_audio(audio_effect_path, volume=0.2)
+            pygame.mixer.init()
+            pygame.mixer.music.load(audio_effect_path)
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.music.play(-1)
 
 
-    def _load_images(self, ambient_images_path: list) -> None:
+    def _load_pygame_images(self, ambient_images_path: list) -> None:
         return [pygame.image.load(image_path) for image_path in ambient_images_path]
 
-    def _load_audio(self, audio_effect_path: str, volume: float) -> None:
-        pygame.mixer.init()
-        pygame.mixer.music.load(audio_effect_path)
-        pygame.mixer.music.set_volume(volume)
-        pygame.mixer.music.play(-1)
 
     def run(self, mdp, test='mdp') -> None:
         prev_time = 0
@@ -117,13 +123,13 @@ class Simulation:
                 pygame.quit()
                 print("Simulation ended.")
                 return
-            
-            
+
             frame += 1
             seconds_passed = frame // 30
 
-
-            if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and seconds_passed >= 5):
+            if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
+                 self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
+                 seconds_passed >= 5):
 
                 state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
                 mdp.policy_iteration(self.car_manager.get_cars())
