@@ -29,6 +29,9 @@ class Environment:
         self.window_width = self.window.get_width()
         self.window_height = self.window.get_height()
 
+    def close(self):
+        pygame.quit()
+
     def get_window(self):
         return self.window
 
@@ -80,4 +83,31 @@ class Environment:
             pygame.draw.line(self.window, WHITE, (self.window_width // 2 + 180, self.window_height // 2 + offset), (self.window_width // 2 + 200, self.window_height // 2 + offset), 2)
         # Cover intersection
         pygame.draw.rect(self.window, GRAY, (self.window_width // 2 - 29, self.window_height // 2 - 29, 60, 60))
+
+    def draw_cars(self, car_manager):
+        [car.draw() for car in car_manager.get_cars()]
+
+    def draw_info_panel(self, car_manager, total_seconds, interval, mode):
+        font = pygame.font.SysFont(None, 24)
+        panel_color = (30, 30, 30)
+        text_color = (255, 255, 255)
+
+        # Create a surface for the panel
+        panel_surface = pygame.Surface((300, 130))
+        panel_surface.fill(panel_color)
+        
+        # Render the text
+        elapsed_time_text = font.render(f"Elapsed Time: {total_seconds} sec", True, text_color)
+        interval_text = font.render(f"Current Interval: {interval}", True, text_color)
+        car_count_text = font.render(f"Total Cars: {len(car_manager.get_cars())}", True, text_color)
+        mode_text = font.render(f"Mode: {'fixed time' if mode == 'ft' else 'mdp'}", True, text_color)
+
+        # Blit the text onto the panel surface
+        panel_surface.blit(elapsed_time_text, (10, 10))
+        panel_surface.blit(interval_text, (10, 40))
+        panel_surface.blit(car_count_text, (10, 70))
+        panel_surface.blit(mode_text, (10, 100))
+
+        # Blit the panel surface onto the window
+        self.window.blit(panel_surface, (10, 10))
 

@@ -99,7 +99,5 @@ class CarManager:
             (car_direction == CarActions.RIGHT and (mid_x - offset - 3 <= x + Car.LENGTH <= mid_x - offset))
         )
 
-    def draw_cars(self):
-        [car.draw() for car in self.cars]
 
     
