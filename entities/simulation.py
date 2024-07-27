@@ -122,7 +122,7 @@ class Simulation:
             )
             self.environment.update()
 
-            self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+            #self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
 
 
     def to_disk(self, data: dict, filename: str) -> None:
