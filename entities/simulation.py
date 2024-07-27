@@ -46,7 +46,6 @@ class Simulation:
             self.car_spwan_policy
         )
 
-        print(self.intervals)
 
     def run(self, mode:str) -> None:
 
@@ -90,30 +89,23 @@ class Simulation:
             # Determine which interval we are in
             interval = self.determine_current_interval(total_seconds, self.intervals)
 
-            if total_seconds != prev_time and total_seconds % self.car_spawn_frequency == 0:  # Add a car every 'spawn_frequency' seconds
-                print(f"Time: {total_seconds}, Interval: {interval}")
-                if interval == 'up_down':
-                    self.car_manager.add_car(direction=[CarActions.UP, CarActions.DOWN])
-                if interval == 'left_right':
-                    self.car_manager.add_car(direction=[CarActions.LEFT, CarActions.RIGHT])
-                elif interval == 'all_directions':
-                    self.car_manager.add_car()
 
-                #if total_seconds % 1 == 0:
-                #    self.cumulative_waiting_times[test].append(cumulative_waiting_time // 30)
-
+            if ((total_seconds != prev_time) and (total_seconds % self.car_spawn_frequency == 0)):
+                
+                self.add_cars_based_on_interval(interval)
 
                 if mode == 'mdp':
 
-                    if ((self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value or 
-                        self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value) and 
+                    is_ns_stoplight_green = True if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else False
+                    is_ew_stoplight_green = True if self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value else False
+
+                    if ((is_ns_stoplight_green or is_ew_stoplight_green) and 
                         total_seconds % 7 == 0 and 
                         int(total_seconds) != int(prev_time)):
 
                         state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
                         mdp.policy_iteration(self.car_manager.get_cars())
                         action = mdp.get_action(state)
-                        # print(f"State {state}, Action: {action}")
 
                         if action == 'change':
                             self.stoplight_manager.stoplight.switch_yellow()
@@ -121,6 +113,9 @@ class Simulation:
                 elif mode == 'ft':
                     if self.stoplight_manager.stoplight.time_green >= 300:
                         self.stoplight_manager.stoplight.switch_yellow()
+
+                else:
+                    raise ValueError("Mode must be either 'mdp' or 'ft'")
 
                 prev_time = total_seconds
 
@@ -140,7 +135,7 @@ class Simulation:
                 interval, 
                 mode
             )
-            pygame.display.update()
+            self.environment.update()
 
     def calculate_intervals(self, total_time, proportions):
         total_proportion = sum(proportion for name, proportion in proportions)
@@ -158,5 +153,11 @@ class Simulation:
                 return interval
         return None
 
-    
+    def add_cars_based_on_interval(self, interval):
+        if interval == 'up_down':
+            self.car_manager.add_car(direction=[CarActions.UP, CarActions.DOWN])
+        elif interval == 'left_right':
+            self.car_manager.add_car(direction=[CarActions.LEFT, CarActions.RIGHT])
+        elif interval == 'all_directions':
+            self.car_manager.add_car()
 

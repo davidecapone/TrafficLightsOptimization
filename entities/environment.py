@@ -31,6 +31,9 @@ class Environment:
 
     def close(self):
         pygame.quit()
+    
+    def update(self):
+        pygame.display.update()
 
     def get_window(self):
         return self.window
