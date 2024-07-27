@@ -10,6 +10,7 @@ class CarManager:
     def __init__(self, window):
             self.window = window
             self.cars = []
+            self.cumulative_waiting_time = 0
 
     def add_car(self, direction = None):
         self.cars.append(
@@ -30,7 +31,8 @@ class CarManager:
 
     def update_cars(self, stoplight):
         for car in self.cars:
-            self.update_car(car, stoplight)
+            self.update_car(car, stoplight) 
+
 
     def update_car(self, car, stoplight) -> None:
         """
@@ -42,6 +44,8 @@ class CarManager:
         """
         if car.is_stopped():
             car.increase_waiting_time()
+            self.cumulative_waiting_time += 1
+
             car_direction = car.get_direction()
 
             if ((car_direction in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == TrafficLightColor.GREEN.value) or
