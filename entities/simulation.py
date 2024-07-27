@@ -34,11 +34,6 @@ class Simulation:
         self.simulation_duration = simulation_duration
         self.car_spwan_policy = car_spwan_policy
 
-        # Statistics
-        #self.cumulative_waiting_times = {'mdp': [0], 'ft': [0]}
-        #self.queue_lengths = {'mdp': [], 'ft': []}
-        #self.n_stopped_cars = {'mdp': 0, 'ft': 0}
-
         # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
         self.cumulative_waiting_times = dict()
 
@@ -115,14 +110,7 @@ class Simulation:
 
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
 
-            self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30
-            
-            """
-            # save cumulative waiting times to disk as csv:
-            with open('cumulative_waiting_times.csv', 'w') as f:
-                for key in self.cumulative_waiting_times.keys():
-                    f.write("%s,%s\n"%(key,self.cumulative_waiting_times[key]))"""
-        
+            self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30        
 
             self.environment.draw_cars(self.car_manager)
             self.environment.draw_info_panel(
@@ -133,6 +121,14 @@ class Simulation:
                 mode
             )
             self.environment.update()
+
+            self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+
+
+    def to_disk(self, data: dict, filename: str) -> None:
+        with open(filename, 'w') as f:
+            for key in data.keys():
+                f.write("%s,%s\n"%(key,data[key]))
 
     def calculate_intervals(self, total_time, proportions):
         total_proportion = sum(proportion for name, proportion in proportions)
