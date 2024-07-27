@@ -41,7 +41,7 @@ class Simulation:
         self.intervals = self.calculate_intervals(simulation_duration, self.car_spwan_policy)
 
 
-    def run(self, mode:str) -> None:
+    def run(self, mode:str) -> tuple:
 
         assert mode in ['mdp', 'ft'], "Mode must be either 'mdp' or 'ft'"
 
@@ -52,6 +52,8 @@ class Simulation:
         clock = pygame.time.Clock()
         total_seconds = 0
         start_ticks = pygame.time.get_ticks()  # Get the start ticks
+
+        n_stopped_cars = 0
 
         while True:
             clock.tick(30)
@@ -67,7 +69,7 @@ class Simulation:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.environment.close()
-                    return
+                    return mode, self.cumulative_waiting_times, n_stopped_cars
 
             # Calculate the elapsed time
             current_ticks = pygame.time.get_ticks()
@@ -80,7 +82,7 @@ class Simulation:
             # Stop the simulation after 'simulation_duration' seconds
             if total_seconds >= self.simulation_duration: 
                 self.environment.close()
-                return
+                return mode, self.cumulative_waiting_times, n_stopped_cars
  
             if ((total_seconds != prev_time) and (total_seconds % self.car_spawn_frequency == 0)):
                 self.add_cars_based_on_interval(interval)
@@ -124,11 +126,6 @@ class Simulation:
 
             #self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
 
-
-    def to_disk(self, data: dict, filename: str) -> None:
-        with open(filename, 'w') as f:
-            for key in data.keys():
-                f.write("%s,%s\n"%(key,data[key]))
 
     def calculate_intervals(self, total_time, proportions):
         total_proportion = sum(proportion for name, proportion in proportions)
