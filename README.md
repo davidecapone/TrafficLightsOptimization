@@ -1,3 +1,7 @@
+> [!NOTE]
+> This repository is part of the final exam for the *Reinforcement Learning* course held by professor Antonio Celani at [University of Trieste](https://www.units.it/en) in the 2023-2024 academic year.
+
+
 # Traffic Lights Optimization with Reinforcement Learning techniques
 
 ## Overview

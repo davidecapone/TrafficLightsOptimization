@@ -16,11 +16,30 @@ class Simulation:
                  car_spwan_policy: list,
                  car_spawn_frequency: float = 1.5,
                  simulation_duration: float = 120) -> None:
-        
-        # Initialize the environment, car manager and stoplight manager
+
+        # Simulation parameters
+        self.name = name
+        self.car_spawn_frequency = car_spawn_frequency
+        self.simulation_duration = simulation_duration
+        self.car_spwan_policy = car_spwan_policy
+
+        # Calculate the intervals
+        self.intervals = self.calculate_intervals(simulation_duration, self.car_spwan_policy)
+
+
+    def run(self, mode:str):
+
+        assert mode in ['mdp', 'ft'], "Mode must be either 'mdp' or 'ft'"
+
+        # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
+        self.cumulative_waiting_times = dict()
+        # Stopped cars will store all the cars that have stopped at the intersection
+        self.n_stopped_cars = dict()
+
+        # Initialize the environment
         self.environment = Environment(
             window_size=(1000, 1000),
-            name=name,
+            name=self.name,
             audio=False
         )
 
@@ -28,22 +47,6 @@ class Simulation:
 
         self.car_manager = CarManager(self.window)
         self.stoplight_manager = StoplightManager()
-
-        # Simulation parameters
-        self.car_spawn_frequency = car_spawn_frequency
-        self.simulation_duration = simulation_duration
-        self.car_spwan_policy = car_spwan_policy
-
-        # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
-        self.cumulative_waiting_times = dict()
-
-        # Calculate the intervals
-        self.intervals = self.calculate_intervals(simulation_duration, self.car_spwan_policy)
-
-
-    def run(self, mode:str) -> tuple:
-
-        assert mode in ['mdp', 'ft'], "Mode must be either 'mdp' or 'ft'"
 
         if mode == 'mdp':
             mdp = TrafficMDP()
@@ -53,7 +56,6 @@ class Simulation:
         total_seconds = 0
         start_ticks = pygame.time.get_ticks()  # Get the start ticks
 
-        n_stopped_cars = 0
 
         while True:
             clock.tick(30)
@@ -69,7 +71,8 @@ class Simulation:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.environment.close()
-                    return mode, self.cumulative_waiting_times, n_stopped_cars
+                    self.save_stats(mode)
+                    return
 
             # Calculate the elapsed time
             current_ticks = pygame.time.get_ticks()
@@ -82,7 +85,8 @@ class Simulation:
             # Stop the simulation after 'simulation_duration' seconds
             if total_seconds >= self.simulation_duration: 
                 self.environment.close()
-                return mode, self.cumulative_waiting_times, n_stopped_cars
+                self.save_stats(mode)
+                return
  
             if ((total_seconds != prev_time) and (total_seconds % self.car_spawn_frequency == 0)):
                 self.add_cars_based_on_interval(interval)
@@ -112,7 +116,10 @@ class Simulation:
 
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
 
-            self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30        
+            # Update the cumulative waiting times
+            self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30  
+            # Update the stopped cars
+            self.n_stopped_cars['stopped_cars'] = self.car_manager.get_n_stopped_cars()      
 
             self.environment.draw_cars(self.car_manager)
             self.environment.draw_info_panel(
@@ -124,7 +131,7 @@ class Simulation:
             )
             self.environment.update()
 
-            #self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+            
 
 
     def calculate_intervals(self, total_time, proportions):
@@ -152,4 +159,13 @@ class Simulation:
             self.car_manager.add_car()
         else:
             return
+
+    def to_disk(self, data, path):
+        with open(path, 'w') as f:
+            for key in data.keys():
+                f.write("%s,%s\n"%(key,data[key]))
+
+    def save_stats(self, mode:str):
+        self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+        self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
 

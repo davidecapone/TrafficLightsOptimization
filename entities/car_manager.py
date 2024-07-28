@@ -11,6 +11,7 @@ class CarManager:
             self.window = window
             self.cars = []
             self.cumulative_waiting_time = 0
+            self.n_stopped_cars = 0
 
     def add_car(self, direction = None):
         self.cars.append(
@@ -19,6 +20,9 @@ class CarManager:
 
     def get_cars(self) -> list:
         return self.cars
+
+    def get_n_stopped_cars(self) -> int:
+        return self.n_stopped_cars
 
     def get_stopped_cars(self, directions: list) -> list:
         """
@@ -55,6 +59,8 @@ class CarManager:
 
         elif (self.is_at_intersection(car) and self.should_stop(car, stoplight)) or not car.can_move(self.cars):
             car.set_stopped(True)
+            self.n_stopped_cars += 1
+            #print(f"Car stopped at {car.get_position()}")
         else:
             car.turn_or_straight()
             car.move()
