@@ -18,6 +18,8 @@ class Simulation:
         self.simulation_duration = self._get_total_time(spawning_rules)
         self.intervals = spawning_rules
 
+        print(f"Simulation duration: {self.simulation_duration} seconds")
+
 
     def _get_total_time(self, spwan_policy: list):
         """
@@ -29,10 +31,10 @@ class Simulation:
         Returns:
         - total time in seconds
         """
-        return (sum(duration for _, duration in spwan_policy)) * 60
+        return (sum(duration for _, duration in spwan_policy))
     
 
-    def run(self, mode:str):
+    def run(self, mode:str, save_stas:bool = False):
 
         assert mode in ['pi', 'vi', 'ft'], "Mode must be either 'pi', 'vi or 'ft'"
 
@@ -76,7 +78,8 @@ class Simulation:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.environment.close()
-                    self.save_stats(mode)
+                    # Save the stats if the user wants to
+                    self.save_stats(mode) if save_stas else None
                     return
 
             # Calculate the elapsed time
@@ -90,7 +93,8 @@ class Simulation:
             # Stop the simulation after 'simulation_duration' seconds
             if total_seconds >= self.simulation_duration: 
                 self.environment.close()
-                self.save_stats(mode)
+                # Save the stats if the user wants to
+                self.save_stats(mode) if save_stas else None
                 return
         
             # Add a car every car_spawn_frequency seconds
@@ -122,8 +126,8 @@ class Simulation:
                         self.stoplight_manager.stoplight.switch_yellow() if action == 'change' else None
                 # Case Fixed Time
                 case 'ft':
-                    # Switch the stoplight to yellow if the stoplight has been green for 5 seconds
-                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 5 else None
+                    # Switch the stoplight to yellow if the stoplight has been green for 7 seconds
+                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 7 else None
                 # Default case
                 case _:
                     raise ValueError(f"Mode: {mode} not yet implemented")
@@ -187,8 +191,8 @@ class Simulation:
                 f.write("%s\n"%item)
 
     def save_stats(self, mode:str):
-        #self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
-        #self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
-        #self.save_list(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')
-        pass
+        self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+        self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
+        self.save_list(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')
+        
 
