@@ -87,6 +87,7 @@ class Simulation:
                 self.environment.close()
                 self.save_stats(mode)
                 return
+        
  
             if ((total_seconds != prev_time) and (total_seconds % self.car_spawn_frequency == 0)):
                 self.add_cars_based_on_interval(interval)
@@ -118,6 +119,8 @@ class Simulation:
 
             # Update the cumulative waiting times
             self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30  
+
+
             # Update the stopped cars
             self.n_stopped_cars['stopped_cars'] = self.car_manager.get_n_stopped_cars()      
 
@@ -165,7 +168,13 @@ class Simulation:
             for key in data.keys():
                 f.write("%s,%s\n"%(key,data[key]))
 
+    def save_list(self, data, path):
+        with open(path, 'w') as f:
+            for item in data:
+                f.write("%s\n"%item)
+
     def save_stats(self, mode:str):
         self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
         self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
+        self.save_list(self.car_manager.queues, f'./data/queue_lenghts_{mode}.csv')
 

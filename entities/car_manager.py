@@ -12,6 +12,14 @@ class CarManager:
             self.cars = []
             self.cumulative_waiting_time = 0
             self.n_stopped_cars = 0
+            self.queue_lenghts = {
+                CarActions.UP:0, 
+                CarActions.DOWN:0, 
+                CarActions.LEFT:0, 
+                CarActions.RIGHT:0
+            }
+
+            self.queues = []
 
     def add_car(self, direction = None):
         self.cars.append(
@@ -49,18 +57,24 @@ class CarManager:
         if car.is_stopped():
             car.increase_waiting_time()
             self.cumulative_waiting_time += 1
-
             car_direction = car.get_direction()
 
             if ((car_direction in [CarActions.UP, CarActions.DOWN] and stoplight.color_NS == TrafficLightColor.GREEN.value) or
                 (car_direction in [CarActions.LEFT, CarActions.RIGHT] and stoplight.color_EW == TrafficLightColor.GREEN.value)):
                 car.set_stopped(False)
+
+                
+                if self.queue_lenghts[car.get_direction()] != 0:
+                    self.queues.append(self.queue_lenghts[car.get_direction()])
+                    self.queue_lenghts[car.get_direction()] = 0
+
                 car.move()
 
         elif (self.is_at_intersection(car) and self.should_stop(car, stoplight)) or not car.can_move(self.cars):
             car.set_stopped(True)
             self.n_stopped_cars += 1
-            #print(f"Car stopped at {car.get_position()}")
+            self.queue_lenghts[car.get_direction()] += 1
+
         else:
             car.turn_or_straight()
             car.move()
