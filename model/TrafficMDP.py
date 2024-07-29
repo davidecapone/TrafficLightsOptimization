@@ -106,7 +106,7 @@ class TrafficMDP:
         Parameters:
         - cars: list of Car objects
 
-        This implementation follows the iterative policy evaluation algorithm seen during the course.
+        This implementation follows the iterative policy evaluation algorithm on the Reinforcement Learning (Sutton, Barto) book.
         '''
         while True:
             delta = 0
@@ -134,7 +134,7 @@ class TrafficMDP:
         Returns:
         - policy_stable: boolean indicating if the policy is stable
 
-        This implementation follows the policy improvement algorithm seen during the course.
+        This implementation follows the policy improvement algorithm on the Reinforcement Learning (Sutton, Barto) book.
         '''
         policy_stable = True
         for state in self.states:
@@ -159,7 +159,7 @@ class TrafficMDP:
         Parameters:
         - cars: list of Car objects
 
-        This implementation follows the policy iteration algorithm seen during the course.
+        This implementation follows the policy iteration algorithm on the Reinforcement Learning (Sutton, Barto) book.
         '''
         while True:
             self.policy_evaluation(cars)
@@ -180,3 +180,45 @@ class TrafficMDP:
         This method returns the action to take in a given state according to the policy (pi*(s)).
         '''
         return random.choices(self.actions, weights=[self.policy[state]['maintain'], self.policy[state]['change']])[0]
+    
+    def value_iteration(self, cars, current_state):
+        '''
+        Perform value iteration.
+
+        Parameters:
+        - cars: list of Car objects
+        - current_state: current state
+
+        Returns:
+        - action: action to take
+
+        This implementation follows the value iteration algorithm seen on the Reinforcement Learning (Sutton, Barto) book.
+        '''
+        while True:
+            delta = 0
+            new_values = {}
+            for state in self.states:
+                v = self.values[state]
+                action_values = []
+                for action in self.actions:
+                    value_sum = 0
+                    for state_ in self.states:
+                        value_sum += self.get_transition_probability(cars, action, state, state_) * (self.get_reward(cars, action, state) + self.discount_factor * self.values[state_])
+                    action_values.append(value_sum)
+
+                new_values[state] = max(action_values)
+                delta = max(delta, abs(v - new_values[state]))
+            
+            self.values = new_values
+
+            if delta < self.theta:
+                break
+
+        action_values = []
+        for action in self.actions:
+            value_sum = 0
+            for state_ in self.states:
+                value_sum += self.get_transition_probability(cars, action, current_state, state_) * (self.get_reward(cars, action, current_state) + self.discount_factor * self.values[state_])
+            action_values.append(value_sum)
+                
+        return self.actions[action_values.index(max(action_values))]

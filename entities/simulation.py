@@ -29,7 +29,7 @@ class Simulation:
 
     def run(self, mode:str):
 
-        assert mode in ['mdp', 'ft'], "Mode must be either 'mdp' or 'ft'"
+        assert mode in ['pi', 'vi', 'ft'], "Mode must be either 'pi', 'vi or 'ft'"
 
         # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
         self.cumulative_waiting_times = dict()
@@ -48,9 +48,8 @@ class Simulation:
         self.car_manager = CarManager(self.window)
         self.stoplight_manager = StoplightManager()
 
-        if mode == 'mdp':
+        if mode == 'pi' or mode == 'vi':
             mdp = TrafficMDP() 
-        # TODO: add VI
 
         prev_time = 0
         clock = pygame.time.Clock()
@@ -78,10 +77,10 @@ class Simulation:
             # Calculate the elapsed time
             current_ticks = pygame.time.get_ticks()
             elapsed_ticks = current_ticks - start_ticks
-            total_seconds = elapsed_ticks // 1000
+            total_seconds = round(elapsed_ticks / 1000, 1)
 
             # Determine which interval we are in
-            interval = self.determine_current_interval(total_seconds, self.intervals)
+            interval = self.determine_current_interval(int(total_seconds), self.intervals)
 
             # Stop the simulation after 'simulation_duration' seconds
             if total_seconds >= self.simulation_duration: 
@@ -89,44 +88,54 @@ class Simulation:
                 self.save_stats(mode)
                 return
         
- 
-            if ((total_seconds != prev_time) and (total_seconds % self.car_spawn_frequency == 0)):
+            # Add a car every car_spawn_frequency seconds
+            if total_seconds % self.car_spawn_frequency == 0 and total_seconds != prev_time:
                 self.add_cars_based_on_interval(interval)
-                prev_time = total_seconds
 
+            # Define the mode of the simulation
             match mode:
-                case 'mdp':
-                    is_ns_stoplight_green = True if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else False
-                    is_ew_stoplight_green = True if self.stoplight_manager.get_ew_color() == TrafficLightColor.GREEN.value else False
-
-                    if ((is_ns_stoplight_green or is_ew_stoplight_green) and 
-                        total_seconds % 7 == 0 and int(total_seconds) != int(prev_time)):
-
+                # Case Policy Iteration
+                case 'pi':
+                    # If the stoplight has been green for 5 seconds, call the policy iteration algorithm
+                    if self.stoplight_manager.stoplight.time_green//30 >= 5 and int(total_seconds) != int(prev_time):
                         # Define the state as NS if the stoplight ns is green, otherwise EW
                         state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
+                        # Get the action from the policy iteration algorithm
                         mdp.policy_iteration(self.car_manager.get_cars())
                         action = mdp.get_action(state)
-
+                        # Switch the stoplight to yellow if the action is 'change'
                         self.stoplight_manager.stoplight.switch_yellow() if action == 'change' else None
-
-                # TODO: add case for vi
-
+                # Case Value Iteration
+                case 'vi':
+                    # If the stoplight has been green for 5 seconds, call the value iteration algorithm
+                    if self.stoplight_manager.stoplight.time_green//30 >= 5 and int(total_seconds) != int(prev_time):
+                        # Define the state as NS if the stoplight ns is green, otherwise EW
+                        state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
+                        # Get the action from the policy iteration algorithm
+                        action = mdp.value_iteration(self.car_manager.get_cars(), state)
+                        # Switch the stoplight to yellow if the action is 'change'
+                        self.stoplight_manager.stoplight.switch_yellow() if action == 'change' else None
+                # Case Fixed Time
                 case 'ft':
-                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green >= 300 else None
-
+                    # Switch the stoplight to yellow if the stoplight has been green for 5 seconds
+                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 5 else None
+                # Default case
                 case _:
                     raise ValueError(f"Mode: {mode} not yet implemented")
+            
+            # Update the previous time to avoid adding cars every frame
+            prev_time = total_seconds
 
-
+            # Update the cars
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
 
             # Update the cumulative waiting times
             self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30  
 
-
             # Update the stopped cars
             self.n_stopped_cars['stopped_cars'] = self.car_manager.get_n_stopped_cars()      
 
+            # Draw the cars and the info panel
             self.environment.draw_cars(self.car_manager)
             self.environment.draw_info_panel(
                 self.car_manager, 
@@ -136,9 +145,6 @@ class Simulation:
                 mode
             )
             self.environment.update()
-
-            
-
 
     def calculate_intervals(self, total_time, proportions):
         total_proportion = sum(proportion for name, proportion in proportions)

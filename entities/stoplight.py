@@ -4,8 +4,7 @@ from entities.colors import TrafficLightColor
 import random
 
 class Stoplight:
-    GREEN_DURATION = 300  # ticks
-    YELLOW_DURATION = 90  # ticks
+    YELLOW_DURATION = 60  # ticks
 
     def __init__(self):
         
@@ -29,8 +28,10 @@ class Stoplight:
 
         if self.color_NS == TrafficLightColor.GREEN.value:
             self.color_NS = TrafficLightColor.YELLOW.value
+            self.time_green = 0
         elif self.color_EW == TrafficLightColor.GREEN.value:
             self.color_EW = TrafficLightColor.YELLOW.value
+            self.time_green = 0
 
     def update_stoplight(self):
 
@@ -43,9 +44,7 @@ class Stoplight:
             if self.color_NS == TrafficLightColor.YELLOW.value:
                 self.color_NS = TrafficLightColor.RED.value
                 self.color_EW = TrafficLightColor.GREEN.value
-                self.time_green = 0
             elif self.color_EW == TrafficLightColor.YELLOW.value:
                 self.color_EW = TrafficLightColor.RED.value
                 self.color_NS = TrafficLightColor.GREEN.value
-                self.time_green = 0
             self.time_yellow = 0
