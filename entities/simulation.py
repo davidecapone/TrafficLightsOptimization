@@ -176,5 +176,5 @@ class Simulation:
     def save_stats(self, mode:str):
         self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
         self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
-        self.save_list(self.car_manager.queues, f'./data/queue_lenghts_{mode}.csv')
+        self.save_list(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')
 
