@@ -5,27 +5,32 @@ from entities.stoplight_manager import StoplightManager
 from model.TrafficMDP import TrafficMDP
 from entities.colors import TrafficLightColor
 from entities.car_actions import CarActions
-import time
 
 class Simulation:
     """
     Defines the simulation of the traffic light.
     """
-    def __init__(self, 
-                 name: str, 
-                 car_spwan_policy: list,
-                 car_spawn_frequency: float = 1.5,
-                 simulation_duration: float = 120) -> None:
-
+    def __init__(self, spawning_rules: list, cars_per_second: float = 1) -> None:
+        
         # Simulation parameters
-        self.name = name
-        self.car_spawn_frequency = car_spawn_frequency
-        self.simulation_duration = simulation_duration
-        self.car_spwan_policy = car_spwan_policy
+        self.car_spawn_frequency = cars_per_second
+        self.car_spwan_policy = spawning_rules
+        self.simulation_duration = self._get_total_time(spawning_rules)
+        self.intervals = spawning_rules
 
-        # Calculate the intervals
-        self.intervals = self.calculate_intervals(simulation_duration, self.car_spwan_policy)
 
+    def _get_total_time(self, spwan_policy: list):
+        """
+        Returns the simulation duration based on the intervals defined.
+
+        Parameters:
+        - spwan_policy: list of tuples with the duration of each interval
+
+        Returns:
+        - total time in seconds
+        """
+        return (sum(duration for _, duration in spwan_policy)) * 60
+    
 
     def run(self, mode:str):
 
@@ -39,7 +44,7 @@ class Simulation:
         # Initialize the environment
         self.environment = Environment(
             window_size=(1000, 1000),
-            name=self.name,
+            name=f'Simulation with {mode} mode',
             audio=False
         )
 
@@ -138,7 +143,6 @@ class Simulation:
             # Draw the cars and the info panel
             self.environment.draw_cars(self.car_manager)
             self.environment.draw_info_panel(
-                self.car_manager, 
                 total_seconds, 
                 interval, 
                 self.cumulative_waiting_times[total_seconds],

@@ -90,8 +90,7 @@ class Environment:
     def draw_cars(self, car_manager):
         [car.draw() for car in car_manager.get_cars()]
 
-    def draw_info_panel(self, 
-            car_manager, 
+    def draw_info_panel(self,
             total_seconds, 
             interval, 
             cumulative_waiting_time, 
@@ -107,17 +106,17 @@ class Environment:
         
         # Render the text
         elapsed_time_text = font.render(f"Elapsed Time: {total_seconds} sec", True, text_color)
-        interval_text = font.render(f"Current Interval: {interval}", True, text_color)
-        car_count_text = font.render(f"Total Cars: {len(car_manager.get_cars())}", True, text_color)
+        interval_text = font.render(f"Spawning rule: {interval}", True, text_color)
         cumulative_waiting_time_text = font.render(f"Cumulative Waitings: {cumulative_waiting_time} sec", True, text_color)
         mode_text = font.render(f"Mode: {'fixed time' if mode == 'ft' else 'mdp'}", True, text_color)
 
         # Blit the text onto the panel surface
         panel_surface.blit(elapsed_time_text, (10, 10))
         panel_surface.blit(interval_text, (10, 40))
-        panel_surface.blit(car_count_text, (10, 70))
-        panel_surface.blit(cumulative_waiting_time_text, (10, 100))
-        panel_surface.blit(mode_text, (10, 130))
+        panel_surface.blit(mode_text, (10, 100))
+
+        panel_surface.blit(cumulative_waiting_time_text, (10, 130))
+        
 
         # Blit the panel surface onto the window
         self.window.blit(panel_surface, (10, 10))
