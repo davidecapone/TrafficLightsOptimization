@@ -5,13 +5,17 @@
 # Traffic Lights Optimization with Reinforcement Learning techniques
 
 ## Overview
-This project simulates a traffic intersection with traffic lights and cars using Pygame. The goal of the simulation is to maximize the throughput of cars at the intersections with stoplights by optimizing the traffic light policies using Reinforcement Learning techniques. The simulation can work with a Markov Decision Process (MDP) model for optimizing the traffic light policies or with fixed times for the stoplights as a baseline of comparison. Cars are spawned according to a customizable policy, and various statistics are tracked during the simulation.
+This project simulates an intersection with traffic lights and cars using Pygame. The goal of the simulation is to maximize the throughput and minimize waiting times and queue lengths of cars at the intersection by optimizing the **traffic light policies** using Reinforcement Learning techniques. 
+
+A fixed time policy is considered as the baseline model for the stoplight. Then, an MDP model is implemented along with 2 Reinforcement Learning algorithms: **Policy Iteration** and **Value Iteration**, and the three solutions are compared.
+
+Cars are spawned according to a customizable rule, and various statistics are tracked during the simulation.
 
 ## Features
 - Simulates traffic lights at an intersection.
-- Supports two traffic light policies: MDP and Fixed Time for baseline comparison.
-- Uses Reinforcement Learning techniques to maximize the throughput of cars.
-- Customizable car spawn policies.
+- Supports different traffic light policies: MDP (with PI or VI) and Fixed Time for baseline comparison.
+- Uses Reinforcement Learning techniques to maximize the throughput, minimize waiting times and queue lengths of cars.
+- Customizable car spawn rule.
 - Displays real-time statistics and information about the simulation.
 - Visual representation of cars and traffic lights.
 
