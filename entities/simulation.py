@@ -49,7 +49,8 @@ class Simulation:
         self.stoplight_manager = StoplightManager()
 
         if mode == 'mdp':
-            mdp = TrafficMDP()
+            mdp = TrafficMDP() 
+        # TODO: add VI
 
         prev_time = 0
         clock = pygame.time.Clock()
@@ -107,6 +108,8 @@ class Simulation:
                         action = mdp.get_action(state)
 
                         self.stoplight_manager.stoplight.switch_yellow() if action == 'change' else None
+
+                # TODO: add case for vi
 
                 case 'ft':
                     self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green >= 300 else None
