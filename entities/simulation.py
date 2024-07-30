@@ -106,7 +106,7 @@ class Simulation:
                 # Case Policy Iteration
                 case 'pi':
                     # If the stoplight has been green for 5 seconds, call the policy iteration algorithm
-                    if self.stoplight_manager.stoplight.time_green//30 >= 5 and int(total_seconds) != int(prev_time):
+                    if self.stoplight_manager.stoplight.time_green//30 >= 15 and int(total_seconds) != int(prev_time):
                         # Define the state as NS if the stoplight ns is green, otherwise EW
                         state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
                         # Get the action from the policy iteration algorithm
@@ -117,7 +117,7 @@ class Simulation:
                 # Case Value Iteration
                 case 'vi':
                     # If the stoplight has been green for 5 seconds, call the value iteration algorithm
-                    if self.stoplight_manager.stoplight.time_green//30 >= 5 and int(total_seconds) != int(prev_time):
+                    if self.stoplight_manager.stoplight.time_green//30 >= 15 and int(total_seconds) != int(prev_time):
                         # Define the state as NS if the stoplight ns is green, otherwise EW
                         state = 'NS' if self.stoplight_manager.get_ns_color() == TrafficLightColor.GREEN.value else 'EW'
                         # Get the action from the policy iteration algorithm
@@ -127,7 +127,7 @@ class Simulation:
                 # Case Fixed Time
                 case 'ft':
                     # Switch the stoplight to yellow if the stoplight has been green for 7 seconds
-                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 5 else None
+                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 20 else None
                 # Default case
                 case _:
                     raise ValueError(f"Mode: {mode} not yet implemented")
