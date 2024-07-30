@@ -10,13 +10,14 @@ class Simulation:
     """
     Defines the simulation of the traffic light.
     """
-    def __init__(self, spawning_rules: list, cars_per_second: float = 1) -> None:
+    def __init__(self, spawning_rules: list, cars_per_second: float = 1, audio: bool = False) -> None:
         
         # Simulation parameters
         self.car_spawn_frequency = cars_per_second
         self.car_spwan_policy = spawning_rules
         self.simulation_duration = self._get_total_time(spawning_rules)
         self.intervals = spawning_rules
+        self.audio = audio
 
         print(f"Simulation duration: {self.simulation_duration} seconds")
 
@@ -47,7 +48,7 @@ class Simulation:
         self.environment = Environment(
             window_size=(1000, 1000),
             name=f'Simulation with {mode} mode',
-            audio=False
+            audio=self.audio
         )
 
         self.window = self.environment.get_window()

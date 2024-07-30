@@ -45,7 +45,7 @@ class Environment:
 
         if audio:
             pygame.mixer.init()
-            pygame.mixer.music.load(audio)
+            pygame.mixer.music.load(AUDIO_PATH)
             pygame.mixer.music.set_volume(0.2)
             pygame.mixer.music.play(-1)
 
