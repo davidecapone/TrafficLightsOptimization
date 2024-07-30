@@ -11,8 +11,23 @@ AUDIO_PATH = './assets/audio/street_sound_effect.mp3'
 class Environment:
     """
     Defines the environment of the simulation, which includes the images and the drawing of the environment.
+
+    Attributes:
+    - window: pygame window
+    - window_width: int representing the width of the window
+    - window_height: int representing the height of the window
+    - ambient_images: list of pygame images representing the images of the environment
+    - audio: bool representing if the audio is enabled
+    
+    Constants:
+    - AMBIENT_IMAGES_PATH: str representing the path to the images
+    - AUDIO_PATH: str representing the path to the audio
+
+    Raises:
+    - AssertionError: If the window size is not greater than 0
+    - AssertionError: If the name is not a valid string
     """
-    def __init__(self, window_size, name, audio):
+    def __init__(self, window_size:int, name:str, audio:bool = False):
         
         assert window_size[0] > 0 and window_size[1] > 0, "Window size must be greater than 0"
         assert name, "Name for the simulation must be a valid string"
@@ -39,6 +54,14 @@ class Environment:
         return self.window
 
     def _pygame_init(self, window_size:tuple, name:str, audio:bool) -> None:
+        """
+        Initialize pygame and the window.
+
+        Parameters:
+        - window_size: tuple representing the size of the window
+        - name: str representing the name of the window
+        - audio: bool representing if the audio is enabled
+        """
         pygame.init()
         pygame.display.set_caption(name)
         self.window = pygame.display.set_mode(window_size)
@@ -50,24 +73,48 @@ class Environment:
             pygame.mixer.music.play(-1)
 
     def _load_pygame_images(self, ambient_images_path: list) -> None:
+        """
+        Load the images of the environment.
+
+        Parameters:
+        - ambient_images_path: list of paths to the images
+
+        Returns:
+        - list: list of pygame images
+        """
         return [pygame.image.load(image_path) for image_path in ambient_images_path]
 
-    def _resize_images(self, ambient_images):
+    def _resize_images(self, ambient_images:list) -> list:
+        """
+        Resize the images of the environment.
+
+        Parameters:
+        - ambient_images: list of pygame images
+        """
         window_width = self.window.get_width()
         window_height = self.window.get_height()
         return [pygame.transform.scale(image, (window_width // 2 - 30, window_height // 2 - 30)) for image in ambient_images]
 
     def draw(self):
+        """
+        Draw the environment.
+        """
         self._blit_images()
         self._draw_lines()
 
     def _blit_images(self):
+        """
+        Blit the images of the environment.
+        """
         self.window.blit(self.ambient_images[0], (0, 0))
         self.window.blit(self.ambient_images[1], (self.window_width // 2 + 30, 0))
         self.window.blit(self.ambient_images[2], (self.window_width // 2 + 30, self.window_height // 2 + 30))
         self.window.blit(self.ambient_images[3], (0, self.window_height // 2 + 30))
 
     def _draw_lines(self):
+        """
+        Draw the lines of the environment.
+        """
         # Draw intersection
         pygame.draw.line(self.window, GRAY, (0, self.window_height // 2), (self.window_width, self.window_height // 2), 60)
         pygame.draw.line(self.window, GRAY, (self.window_width // 2, 0), (self.window_width // 2, self.window_height), 60)
@@ -88,14 +135,28 @@ class Environment:
         pygame.draw.rect(self.window, GRAY, (self.window_width // 2 - 29, self.window_height // 2 - 29, 60, 60))
 
     def draw_cars(self, car_manager):
+        """
+        Draw the cars on the window.
+
+        Parameters:
+        - car_manager: car_manager object
+        """
         [car.draw() for car in car_manager.get_cars()]
 
     def draw_info_panel(self,
-            total_seconds, 
-            interval, 
-            cumulative_waiting_time, 
-            mode):
-        
+            total_seconds:int, 
+            interval:str, 
+            cumulative_waiting_time:int, 
+            mode:str):
+        """
+        Draw the information panel on the window.
+
+        Parameters:
+        - total_seconds: int representing the total seconds of the simulation.
+        - interval: str representing the interval of the simulation.
+        - cumulative_waiting_time: int representing the cumulative waiting time of the cars.
+        - mode: str representing the mode of the simulation
+        """ 
         font = pygame.font.SysFont(None, 24)
         panel_color = (30, 30, 30)
         text_color = (255, 255, 255)
@@ -114,10 +175,8 @@ class Environment:
         panel_surface.blit(elapsed_time_text, (10, 10))
         panel_surface.blit(interval_text, (10, 40))
         panel_surface.blit(mode_text, (10, 70))
-
         panel_surface.blit(cumulative_waiting_time_text, (10, 100))
         
-
         # Blit the panel surface onto the window
         self.window.blit(panel_surface, (10, 10))
 

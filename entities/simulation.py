@@ -9,10 +9,15 @@ from entities.car_actions import CarActions
 class Simulation:
     """
     Defines the simulation of the traffic light.
+
+    Attributes:
+    - spawning_rules: list of tuples with the duration of each interval
+    - cars_per_second: float representing the number of cars that spawn per second
+    - audio: bool representing if the audio is enabled
+    - simulation_duration: int representing the total duration of the simulation
+    - intervals: list of tuples with the duration of each interval
     """
-    def __init__(self, spawning_rules: list, cars_per_second: float = 1, audio: bool = False) -> None:
-        
-        # Simulation parameters
+    def __init__(self, spawning_rules:list, cars_per_second:float = 1, audio:bool = False) -> None:
         self.car_spawn_frequency = cars_per_second
         self.car_spwan_policy = spawning_rules
         self.simulation_duration = self._get_total_time(spawning_rules)
@@ -21,13 +26,12 @@ class Simulation:
 
         print(f"Simulation duration: {self.simulation_duration} seconds")
 
-
-    def _get_total_time(self, spwan_policy: list):
+    def _get_total_time(self, spwan_policy: list) -> int:
         """
         Returns the simulation duration based on the intervals defined.
 
         Parameters:
-        - spwan_policy: list of tuples with the duration of each interval
+        - spawn_policy: list of tuples with the duration of each interval
 
         Returns:
         - total time in seconds
@@ -36,7 +40,13 @@ class Simulation:
     
 
     def run(self, mode:str, save_stats:bool = False):
+        """
+        Run the simulation.
 
+        Parameters:
+        - mode: str representing the mode of the simulation (pi, vi, ft)
+        - save_stats: bool representing if the stats should be saved
+        """
         assert mode in ['pi', 'vi', 'ft'], "Mode must be either 'pi', 'vi or 'ft'"
 
         # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
@@ -156,12 +166,33 @@ class Simulation:
             )
             self.environment.update()
 
-    def calculate_intervals(self, total_time, proportions):
+    def calculate_intervals(self, total_time:int, proportions:list) -> list:
+        """
+        Calculate the intervals based on the total time and the proportions of each interval.
+
+        Parameters:
+        - total_time: int representing the total time of the simulation
+        - proportions: list of tuples with the proportion of each interval
+
+        Returns:
+        - list of tuples with the name of the interval and the duration
+        """
         total_proportion = sum(proportion for name, proportion in proportions)
         intervals = [(name, int((proportion / total_proportion) * total_time)) for name, proportion in proportions]
         return intervals
 
-    def determine_current_interval(self, total_seconds, intervals):
+    def determine_current_interval(self, total_seconds:int, intervals:list):
+        """
+        Determine the current interval based on the total seconds and the intervals defined.
+
+        Parameters:
+        - total_seconds: int representing the total seconds of the simulation
+        - intervals: list of tuples with the name of the interval and the duration
+
+        Returns:
+        - str: the name of the current interval
+        - None: if the interval is not found
+        """
         total_duration = sum(duration for name, duration in intervals)
         cycle_time = total_seconds % total_duration
 
@@ -172,7 +203,16 @@ class Simulation:
                 return interval
         return None
 
-    def add_cars_based_on_interval(self, interval):
+    def add_cars_based_on_interval(self, interval:str) -> None:
+        """
+        Add cars based on the interval defined.
+
+        Parameters:
+        - interval: str representing the interval of the simulation
+
+        Returns:
+        - None
+        """
         if interval == 'up_down':
             self.car_manager.add_car(direction=[CarActions.UP, CarActions.DOWN])
         elif interval == 'left_right':
@@ -182,7 +222,14 @@ class Simulation:
         else:
             return
 
-    def to_disk(self, data, path):
+    def to_disk(self, data, path:str):
+        """
+        Save the data to disk.
+
+        Parameters:
+        - data: data to save
+        - path: str representing the path to save the data
+        """
         with open(path, 'w') as f:
             if isinstance(data, list):
                 for item in data:
@@ -191,6 +238,12 @@ class Simulation:
                 f.write(str(data))
 
     def save_stats(self, mode:str):
+        """
+        Save the stats of the simulation to disk.
+
+        Parameters:
+        - mode: str representing the mode of the simulation
+        """
         self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waiting_times_{mode}.csv')
         self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
         self.to_disk(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')

@@ -27,7 +27,7 @@ class TrafficMDP:
             'NS': {'maintain': 0.5, 'change': 0.5}
         }
 
-    def get_reward(self, cars, action, state):
+    def get_reward(self, cars:list, action:CarActions, state:str):
         '''
         Get the reward R(s, a) for a given state-action pair.
 
@@ -66,7 +66,7 @@ class TrafficMDP:
         else:
             return incoming_cars / avg_wait_time if avg_wait_time > 0 else incoming_cars
         
-    def get_transition_probability(self, cars, action, state, next_state):
+    def get_transition_probability(self, cars:list, action:CarActions, state:str, next_state:str):
         '''
         Get the transition probability P(s', r| s, a) for a given state-action pair.
 
@@ -99,7 +99,7 @@ class TrafficMDP:
         else:
             return 0
 
-    def policy_evaluation(self, cars):
+    def policy_evaluation(self, cars:list):
         '''
         Evaluate the policy using iterative policy evaluation.
 
@@ -124,7 +124,7 @@ class TrafficMDP:
             if delta < self.theta:
                 return
 
-    def policy_improvement(self, cars):
+    def policy_improvement(self, cars:list):
         '''
         Improve the policy using policy improvement.
 
@@ -152,7 +152,7 @@ class TrafficMDP:
 
         return policy_stable
 
-    def policy_iteration(self, cars):
+    def policy_iteration(self, cars:list):
         '''
         Perform policy iteration.
 
@@ -167,7 +167,7 @@ class TrafficMDP:
             if self.policy_improvement(cars):
                 return
 
-    def get_action(self, state):
+    def get_action(self, state:str):
         '''
         Get the action to take in a given state.
 
@@ -181,7 +181,7 @@ class TrafficMDP:
         '''
         return random.choices(self.actions, weights=[self.policy[state]['maintain'], self.policy[state]['change']])[0]
     
-    def value_iteration(self, cars, current_state):
+    def value_iteration(self, cars:list, current_state:str):
         '''
         Perform value iteration.
 
