@@ -34,14 +34,14 @@ class Simulation:
         return (sum(duration for _, duration in spwan_policy))
     
 
-    def run(self, mode:str, save_stas:bool = False):
+    def run(self, mode:str, save_stats:bool = False):
 
         assert mode in ['pi', 'vi', 'ft'], "Mode must be either 'pi', 'vi or 'ft'"
 
         # Cumulative waiting times will measure the total waiting time of all cars that have stopped at the intersection
-        self.cumulative_waiting_times = dict()
+        self.cumulative_waiting_times = [0]
         # Stopped cars will store all the cars that have stopped at the intersection
-        self.n_stopped_cars = dict()
+        self.n_stopped_cars = 0
 
         # Initialize the environment
         self.environment = Environment(
@@ -79,13 +79,13 @@ class Simulation:
                 if event.type == pygame.QUIT:
                     self.environment.close()
                     # Save the stats if the user wants to
-                    self.save_stats(mode) if save_stas else None
+                    self.save_stats(mode) if save_stats else None
                     return
 
             # Calculate the elapsed time
             current_ticks = pygame.time.get_ticks()
             elapsed_ticks = current_ticks - start_ticks
-            total_seconds = round(elapsed_ticks / 1000, 1)
+            total_seconds = round(elapsed_ticks / 1000, 1) # Round to 1 decimal place, so that it is possible to spawn cars every tenth of a second.
 
             # Determine which interval we are in
             interval = self.determine_current_interval(int(total_seconds), self.intervals)
@@ -94,7 +94,7 @@ class Simulation:
             if total_seconds >= self.simulation_duration: 
                 self.environment.close()
                 # Save the stats if the user wants to
-                self.save_stats(mode) if save_stas else None
+                self.save_stats(mode) if save_stats else None
                 return
         
             # Add a car every car_spawn_frequency seconds
@@ -127,29 +127,30 @@ class Simulation:
                 # Case Fixed Time
                 case 'ft':
                     # Switch the stoplight to yellow if the stoplight has been green for 7 seconds
-                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 7 else None
+                    self.stoplight_manager.stoplight.switch_yellow() if self.stoplight_manager.stoplight.time_green//30 >= 5 else None
                 # Default case
                 case _:
                     raise ValueError(f"Mode: {mode} not yet implemented")
-            
-            # Update the previous time to avoid adding cars every frame
-            prev_time = total_seconds
 
             # Update the cars
             self.car_manager.update_cars(self.stoplight_manager.stoplight)
 
-            # Update the cumulative waiting times
-            self.cumulative_waiting_times[total_seconds] = self.car_manager.cumulative_waiting_time//30  
+            # Update the cumulative waiting times every second
+            if int(total_seconds) != int(prev_time):
+                self.cumulative_waiting_times.append(self.car_manager.cumulative_waiting_time//30) 
+
+            # Update the previous time (to check if a second has passed)
+            prev_time = total_seconds
 
             # Update the stopped cars
-            self.n_stopped_cars['stopped_cars'] = self.car_manager.get_n_stopped_cars()      
+            self.n_stopped_cars = self.car_manager.get_n_stopped_cars()   
 
             # Draw the cars and the info panel
             self.environment.draw_cars(self.car_manager)
             self.environment.draw_info_panel(
-                total_seconds, 
+                int(total_seconds), 
                 interval, 
-                self.cumulative_waiting_times[total_seconds],
+                self.cumulative_waiting_times[-1],
                 mode
             )
             self.environment.update()
@@ -182,17 +183,15 @@ class Simulation:
 
     def to_disk(self, data, path):
         with open(path, 'w') as f:
-            for key in data.keys():
-                f.write("%s,%s\n"%(key,data[key]))
-
-    def save_list(self, data, path):
-        with open(path, 'w') as f:
-            for item in data:
-                f.write("%s\n"%item)
+            if isinstance(data, list):
+                for item in data:
+                    f.write("%s,\n"%(item))
+            else:
+                f.write(str(data))
 
     def save_stats(self, mode:str):
-        self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waitingtimes_{mode}.csv')
+        self.to_disk(self.cumulative_waiting_times, f'./data/cumulative_waiting_times_{mode}.csv')
         self.to_disk(self.n_stopped_cars, f'./data/stopped_cars_{mode}.csv')
-        self.save_list(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')
+        self.to_disk(self.car_manager.queues, f'./data/queue_lengths_{mode}.csv')
         
 

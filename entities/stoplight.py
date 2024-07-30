@@ -4,7 +4,7 @@ from entities.colors import TrafficLightColor
 import random
 
 class Stoplight:
-    YELLOW_DURATION = 60  # ticks
+    YELLOW_DURATION = 90  # ticks
 
     def __init__(self):
         

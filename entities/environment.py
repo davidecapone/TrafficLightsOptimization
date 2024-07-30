@@ -108,7 +108,7 @@ class Environment:
         elapsed_time_text = font.render(f"Elapsed Time: {total_seconds} sec", True, text_color)
         interval_text = font.render(f"Spawning rule: {interval}", True, text_color)
         cumulative_waiting_time_text = font.render(f"Cumulative Waitings: {cumulative_waiting_time} sec", True, text_color)
-        mode_text = font.render(f"Running mode: {'fixed time' if mode == 'ft' else 'mdp'}", True, text_color)
+        mode_text = font.render(f"Running mode: {'fixed time' if mode == 'ft' else 'policy iteration' if mode == 'pi' else 'value iteration'}", True, text_color)
 
         # Blit the text onto the panel surface
         panel_surface.blit(elapsed_time_text, (10, 10))
