@@ -12,13 +12,13 @@ class Simulation:
 
     Attributes:
     - spawning_rules: list of tuples with the duration of each interval
-    - cars_per_second: float representing the number of cars that spawn per second
+    - car_spawn_rate: float representing the spawn rate of cars in seconds
     - audio: bool representing if the audio is enabled
     - simulation_duration: int representing the total duration of the simulation
     - intervals: list of tuples with the duration of each interval
     """
-    def __init__(self, spawning_rules:list, cars_per_second:float = 1, audio:bool = False) -> None:
-        self.car_spawn_frequency = cars_per_second
+    def __init__(self, spawning_rules:list, car_spawn_rate:float = 1, audio:bool = False) -> None:
+        self.car_spawn_frequency = car_spawn_rate
         self.car_spwan_policy = spawning_rules
         self.simulation_duration = self._get_total_time(spawning_rules)
         self.intervals = spawning_rules
@@ -26,7 +26,7 @@ class Simulation:
 
         print(f"Simulation duration: {self.simulation_duration} seconds")
 
-    def _get_total_time(self, spwan_policy: list) -> int:
+    def _get_total_time(self, spawn_policy: list) -> int:
         """
         Returns the simulation duration based on the intervals defined.
 
@@ -36,7 +36,7 @@ class Simulation:
         Returns:
         - total time in seconds
         """
-        return (sum(duration for _, duration in spwan_policy))
+        return (sum(duration for _, duration in spawn_policy))
     
 
     def run(self, mode:str, save_stats:bool = False):
